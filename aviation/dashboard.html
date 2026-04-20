@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parts Aviation Solutions · Operations Center</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: "#f9f9f9",
+                        ink: "#1a1c1c",
+                        primary: "#0056c6",
+                        primaryDark: "#004099",
+                        accent: "#006df8",
+                        aog: "#dc2626",
+                        rush: "#f59e0b",
+                        ok: "#16a34a",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .aog-pulse {
+            animation: aog-pulse 1.5s infinite;
+            background: linear-gradient(90deg, #dc2626 0%, #b91c1c 50%, #dc2626 100%);
+            background-size: 200% 100%;
+        }
+        @keyframes aog-pulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .live-dot::before {
+            content: '';
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: #16a34a;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .bar {
+            background: linear-gradient(90deg, #0056c6 0%, #006df8 100%);
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+        .aog-bar { background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%); }
+        .rush-bar { background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%); }
+        .rep-card { transition: all 0.2s; cursor: pointer; }
+        .rep-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,86,198,0.12); }
+        .countdown { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-surface text-ink font-sans antialiased min-h-screen">
+
+<!-- Demo Banner -->
+<div class="bg-amber-400 text-slate-900 text-xs font-bold uppercase tracking-widest py-2 text-center">
+    Demo privado · MC Designs × Parts Aviation Solutions · Operations Center
+</div>
+
+<!-- AOG Alert Bar -->
+<div class="aog-pulse text-white px-6 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-2xl">priority_high</span>
+            <span class="font-bold uppercase tracking-widest text-sm">AOG Active · 2 aircraft grounded</span>
+        </div>
+        <div class="flex items-center gap-6 text-xs font-mono">
+            <div class="flex items-center gap-2">
+                <span class="opacity-70">AERO-SJU-0421:</span>
+                <span class="countdown font-bold" id="aog1">04:23:11</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="opacity-70">CARIB-STT-0420:</span>
+                <span class="countdown font-bold" id="aog2">12:47:33</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="bg-white border-b border-slate-200 px-6 md:px-12 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white">flight</span>
+            </div>
+            <div>
+                <div class="font-bold text-lg">Parts Aviation · OPS</div>
+                <div class="text-[11px] uppercase tracking-[0.2em] text-slate-500">Davenport, FL · Live operations center</div>
+            </div>
+        </div>
+        <nav class="flex items-center gap-3 text-sm">
+            <a href="/aviation" class="text-slate-600 hover:text-primary transition">← RFQ Form</a>
+            <a href="/aviation/email-parse" class="text-slate-600 hover:text-primary transition">Email Parser</a>
+            <div class="hidden md:flex items-center gap-2 ml-4 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-xs live-dot">
+                <span class="font-bold uppercase tracking-widest text-green-700">All systems live</span>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 md:px-12 py-8 space-y-8">
+
+    <!-- KPI Row -->
+    <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">RFQs Today</div>
+            <div class="text-4xl font-black mt-2">24</div>
+            <div class="text-xs text-green-600 mt-1 font-semibold">↑ 18% vs avg</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-aog/30">
+            <div class="text-xs text-aog uppercase tracking-widest font-bold">AOG Open</div>
+            <div class="text-4xl font-black mt-2 text-aog">2</div>
+            <div class="text-xs text-slate-500 mt-1 font-semibold">1 critical &lt;6hr</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">Avg Response</div>
+            <div class="text-4xl font-black mt-2">8<span class="text-lg text-slate-400">m</span></div>
+            <div class="text-xs text-green-600 mt-1 font-semibold">Target: &lt;15m ✓</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">Quotes Sent</div>
+            <div class="text-4xl font-black mt-2">17</div>
+            <div class="text-xs text-slate-500 mt-1 font-semibold">$1.2M pipeline</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">Deals Closed (wk)</div>
+            <div class="text-4xl font-black mt-2">6</div>
+            <div class="text-xs text-green-600 mt-1 font-semibold">$284K revenue</div>
+        </div>
+    </section>
+
+    <!-- Team Workload -->
+    <section>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold tracking-tight">Team Workload</h2>
+            <span class="text-xs text-slate-500 uppercase tracking-widest font-bold">Live · Auto-routing enabled</span>
+        </div>
+        <div class="grid md:grid-cols-4 gap-4">
+            <div class="rep-card bg-white rounded-xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <div class="font-bold">AJ Caballero</div>
+                        <div class="text-xs text-slate-500">COO · AOG Lead</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-aog/10 text-aog rounded-full font-bold">2 AOG</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Active RFQs</span><span class="font-bold">8</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="aog-bar h-full" style="width: 90%"></div></div>
+                    <div class="text-[11px] text-slate-500">Capacity · 90%</div>
+                </div>
+            </div>
+            <div class="rep-card bg-white rounded-xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <div class="font-bold">Aldo Ponce</div>
+                        <div class="text-xs text-slate-500">Sales Director</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-rush/10 text-rush rounded-full font-bold">1 Rush</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Active RFQs</span><span class="font-bold">7</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="rush-bar h-full" style="width: 70%"></div></div>
+                    <div class="text-[11px] text-slate-500">Capacity · 70%</div>
+                </div>
+            </div>
+            <div class="rep-card bg-white rounded-xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <div class="font-bold">Anetchalie Hernandez</div>
+                        <div class="text-xs text-slate-500">Account Manager</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-bold">Standard</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Active RFQs</span><span class="font-bold">9</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="bar" style="width: 60%"></div></div>
+                    <div class="text-[11px] text-slate-500">Capacity · 60%</div>
+                </div>
+            </div>
+            <div class="rep-card bg-white rounded-xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <div class="font-bold">Christopher Diaz</div>
+                        <div class="text-xs text-slate-500">CEO · Escalations</div>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full font-bold">Escalate only</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Active RFQs</span><span class="font-bold">1</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="bar" style="width: 10%"></div></div>
+                    <div class="text-[11px] text-slate-500">Capacity · 10%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two-column: ATA breakdown + Pipeline -->
+    <section class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl p-6 border border-slate-200">
+            <h3 class="font-bold text-lg mb-4">RFQs by ATA Chapter <span class="text-xs text-slate-500 font-normal">· Last 7 days</span></h3>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <div class="flex justify-between mb-1"><span>71–80 · Engines / Powerplant</span><span class="font-bold">42</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2"><div class="bar" style="width: 85%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1"><span>32 · Landing Gear</span><span class="font-bold">28</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2"><div class="bar" style="width: 56%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1"><span>31 · Avionics</span><span class="font-bold">19</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2"><div class="bar" style="width: 38%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1"><span>29 · Hydraulic Power</span><span class="font-bold">14</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2"><div class="bar" style="width: 28%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1"><span>49 · APU</span><span class="font-bold">11</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2"><div class="bar" style="width: 22%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1"><span>Other</span><span class="font-bold">8</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2"><div class="bar" style="width: 16%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 border border-slate-200">
+            <h3 class="font-bold text-lg mb-4">Pipeline Funnel <span class="text-xs text-slate-500 font-normal">· This week</span></h3>
+            <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <div class="flex justify-between text-sm mb-1"><span class="font-semibold">RFQs received</span><span class="font-bold">124</span></div>
+                        <div class="w-full bg-primary/10 rounded-lg h-10 relative overflow-hidden">
+                            <div class="bg-primary h-full flex items-center px-3 text-white text-xs font-bold" style="width: 100%">100%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <div class="flex justify-between text-sm mb-1"><span class="font-semibold">Qualified &amp; routed</span><span class="font-bold">118</span></div>
+                        <div class="w-full bg-primary/10 rounded-lg h-10 relative overflow-hidden">
+                            <div class="bg-primary h-full flex items-center px-3 text-white text-xs font-bold" style="width: 95%">95%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <div class="flex justify-between text-sm mb-1"><span class="font-semibold">Quote sent</span><span class="font-bold">89</span></div>
+                        <div class="w-full bg-primary/10 rounded-lg h-10 relative overflow-hidden">
+                            <div class="bg-primary h-full flex items-center px-3 text-white text-xs font-bold" style="width: 72%">72%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <div class="flex justify-between text-sm mb-1"><span class="font-semibold">Customer confirmed</span><span class="font-bold">34</span></div>
+                        <div class="w-full bg-green-100 rounded-lg h-10 relative overflow-hidden">
+                            <div class="bg-green-600 h-full flex items-center px-3 text-white text-xs font-bold" style="width: 27%">27% · $284K</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Feed -->
+    <section>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold tracking-tight">Live RFQ Feed</h2>
+            <div class="flex items-center gap-2 text-xs text-green-700 live-dot">
+                <span class="uppercase tracking-widest font-bold">Live</span>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-xs uppercase tracking-widest text-slate-500">
+                    <tr>
+                        <th class="text-left px-4 py-3 font-bold">Time</th>
+                        <th class="text-left px-4 py-3 font-bold">Ticket</th>
+                        <th class="text-left px-4 py-3 font-bold">Company</th>
+                        <th class="text-left px-4 py-3 font-bold">Part · ATA</th>
+                        <th class="text-left px-4 py-3 font-bold">Urgency</th>
+                        <th class="text-left px-4 py-3 font-bold">Routed to</th>
+                        <th class="text-left px-4 py-3 font-bold">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-slate-600 font-mono">10:42</td>
+                        <td class="px-4 py-3 font-mono font-bold text-primary">RFQ-847201</td>
+                        <td class="px-4 py-3 font-semibold">AeroSur Charter</td>
+                        <td class="px-4 py-3"><span class="text-slate-600">C20620100 · </span><span class="text-xs text-slate-500">32 Landing Gear</span></td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-aog text-white rounded-full font-bold">AOG</span></td>
+                        <td class="px-4 py-3">AJ Caballero</td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-aog/10 text-aog rounded-full font-bold">Sourcing · 4h</span></td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-slate-600 font-mono">10:38</td>
+                        <td class="px-4 py-3 font-mono font-bold text-primary">RFQ-847195</td>
+                        <td class="px-4 py-3 font-semibold">Caribbean Air Cargo</td>
+                        <td class="px-4 py-3"><span class="text-slate-600">65B45192-1 · </span><span class="text-xs text-slate-500">29 Hydraulic</span></td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full font-bold">STANDARD</span></td>
+                        <td class="px-4 py-3">Anetchalie H.</td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold">Quoted · $4,800</span></td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-slate-600 font-mono">10:24</td>
+                        <td class="px-4 py-3 font-mono font-bold text-primary">RFQ-847188</td>
+                        <td class="px-4 py-3 font-semibold">Pacific Wings Ltd</td>
+                        <td class="px-4 py-3"><span class="text-slate-600">CFM56-7B · </span><span class="text-xs text-slate-500">72 Engine</span></td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-rush text-white rounded-full font-bold">RUSH</span></td>
+                        <td class="px-4 py-3">Aldo Ponce</td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-rush/10 text-rush rounded-full font-bold">Supplier check</span></td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-slate-600 font-mono">10:11</td>
+                        <td class="px-4 py-3 font-mono font-bold text-primary">RFQ-847172</td>
+                        <td class="px-4 py-3 font-semibold">Skyline Jets</td>
+                        <td class="px-4 py-3"><span class="text-slate-600">AH-200 · </span><span class="text-xs text-slate-500">31 Avionics</span></td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full font-bold">STANDARD</span></td>
+                        <td class="px-4 py-3">Anetchalie H.</td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold">Closed · $12,400</span></td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-slate-600 font-mono">09:47</td>
+                        <td class="px-4 py-3 font-mono font-bold text-primary">RFQ-847163</td>
+                        <td class="px-4 py-3 font-semibold">Caribbean STT</td>
+                        <td class="px-4 py-3"><span class="text-slate-600">HTF7000 · </span><span class="text-xs text-slate-500">72 Engine</span></td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-aog text-white rounded-full font-bold">AOG</span></td>
+                        <td class="px-4 py-3">AJ Caballero</td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-rush/10 text-rush rounded-full font-bold">Courier dispatch</span></td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-slate-600 font-mono">09:12</td>
+                        <td class="px-4 py-3 font-mono font-bold text-primary">RFQ-847151</td>
+                        <td class="px-4 py-3 font-semibold">Trans-Atlantic Air</td>
+                        <td class="px-4 py-3"><span class="text-slate-600">APS5000 · </span><span class="text-xs text-slate-500">49 APU</span></td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-rush text-white rounded-full font-bold">RUSH</span></td>
+                        <td class="px-4 py-3">Aldo Ponce</td>
+                        <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold">Quoted · $87K</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Condition breakdown -->
+    <section class="grid md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl p-5 border border-slate-200 text-center">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">NE · New</div>
+            <div class="text-3xl font-black mt-2 text-primary">31</div>
+            <div class="text-[11px] text-slate-500">1–3 day lead</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-slate-200 text-center">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">SV · Serviceable</div>
+            <div class="text-3xl font-black mt-2 text-primary">48</div>
+            <div class="text-[11px] text-slate-500">2–5 day lead</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-slate-200 text-center">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">OH · Overhauled</div>
+            <div class="text-3xl font-black mt-2 text-primary">29</div>
+            <div class="text-[11px] text-slate-500">5–10 day lead · premium</div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-slate-200 text-center">
+            <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">AR · As Removed</div>
+            <div class="text-3xl font-black mt-2 text-primary">16</div>
+            <div class="text-[11px] text-slate-500">Variable lead</div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="py-8 px-6 md:px-12 border-t border-slate-200 text-center text-sm text-slate-500 mt-8">
+    Operations Center simulado · MC Designs × Parts Aviation Solutions · <a href="https://mcdesignspr.com" class="text-primary hover:underline">mcdesignspr.com</a>
+</footer>
+
+<script>
+    // Countdown timers for AOG cases
+    function tick(id, totalSec) {
+        const el = document.getElementById(id);
+        let sec = totalSec;
+        setInterval(() => {
+            sec = Math.max(0, sec - 1);
+            const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+            const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            if (el) el.textContent = `${h}:${m}:${s}`;
+        }, 1000);
+    }
+    tick('aog1', 4 * 3600 + 23 * 60 + 11);
+    tick('aog2', 12 * 3600 + 47 * 60 + 33);
+</script>
+
+</body>
+</html>

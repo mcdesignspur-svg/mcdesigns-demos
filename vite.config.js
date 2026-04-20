@@ -9,6 +9,8 @@ export default defineConfig({
                 westside: resolve(__dirname, 'westside/index.html'),
                 westsideDashboard: resolve(__dirname, 'westside/dashboard.html'),
                 aviation: resolve(__dirname, 'aviation/index.html'),
+                aviationDashboard: resolve(__dirname, 'aviation/dashboard.html'),
+                aviationEmailParse: resolve(__dirname, 'aviation/email-parse.html'),
                 burbuja: resolve(__dirname, 'burbuja/index.html'),
                 burbujaDashboard: resolve(__dirname, 'burbuja/dashboard.html'),
             },

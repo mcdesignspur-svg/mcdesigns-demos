@@ -7,6 +7,8 @@
     { "source": "/westside", "destination": "/westside/index.html" },
     { "source": "/westside/dashboard", "destination": "/westside/dashboard.html" },
     { "source": "/aviation", "destination": "/aviation/index.html" },
+    { "source": "/aviation/dashboard", "destination": "/aviation/dashboard.html" },
+    { "source": "/aviation/email-parse", "destination": "/aviation/email-parse.html" },
     { "source": "/burbuja", "destination": "/burbuja/index.html" },
     { "source": "/burbuja/dashboard", "destination": "/burbuja/dashboard.html" }
   ],

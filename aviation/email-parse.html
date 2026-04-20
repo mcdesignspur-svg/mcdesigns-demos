@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parts Aviation · Email RFQ Parser</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: "#f9f9f9",
+                        ink: "#1a1c1c",
+                        primary: "#0056c6",
+                        accent: "#006df8",
+                        aog: "#dc2626",
+                        rush: "#f59e0b",
+                        ok: "#16a34a",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .hero-gradient { background: linear-gradient(135deg, #0056c6 0%, #006df8 100%); }
+        .terminal {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .terminal .key { color: #7dd3fc; }
+        .terminal .str { color: #86efac; }
+        .terminal .num { color: #fbbf24; }
+        .terminal .bool { color: #f472b6; }
+        .terminal .null { color: #94a3b8; }
+        .preset-btn { transition: all 0.15s; cursor: pointer; }
+        .preset-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .preset-btn.active { border-color: #0056c6; background: #eff6ff; }
+        .extract-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+        }
+        .extract-label { color: #64748b; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .extract-value { color: #1a1c1c; font-weight: 500; }
+        .pulse-line {
+            display: flex; align-items: center; gap: 10px;
+            opacity: 0; animation: fadeSlide 0.4s ease-out forwards;
+        }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body class="bg-surface text-ink font-sans antialiased min-h-screen">
+
+<!-- Demo Banner -->
+<div class="bg-amber-400 text-slate-900 text-xs font-bold uppercase tracking-widest py-2 text-center">
+    Demo privado · MC Designs × Parts Aviation Solutions · Email RFQ Parser
+</div>
+
+<!-- Header -->
+<header class="bg-white border-b border-slate-200 px-6 md:px-12 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white">mail</span>
+            </div>
+            <div>
+                <div class="font-bold text-lg">Email RFQ Parser</div>
+                <div class="text-[11px] uppercase tracking-[0.2em] text-slate-500">Unstructured email → structured ticket · &lt;8 sec</div>
+            </div>
+        </div>
+        <nav class="flex items-center gap-3 text-sm">
+            <a href="/aviation" class="text-slate-600 hover:text-primary transition">RFQ Form</a>
+            <a href="/aviation/dashboard" class="text-slate-600 hover:text-primary transition">Dashboard</a>
+        </nav>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 md:px-12 py-8 space-y-8">
+
+    <!-- Hero -->
+    <section class="text-center space-y-4 py-8">
+        <span class="inline-block px-4 py-1.5 bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest rounded-full">
+            Killer feature · saves hours per day
+        </span>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tighter">From messy email to structured ticket<br/><span class="text-primary">in under 8 seconds.</span></h1>
+        <p class="text-slate-600 max-w-2xl mx-auto">Paste any inbound RFQ email below. Claude extracts part number, aircraft, condition, quantity, deadline, AOG flag — and drafts the quote. No more copy-paste.</p>
+    </section>
+
+    <!-- Presets -->
+    <section>
+        <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Try a real-world email</p>
+        <div class="grid md:grid-cols-3 gap-3 mb-6">
+            <button onclick="loadPreset('aog')" class="preset-btn text-left p-4 border-2 border-slate-200 rounded-xl bg-white" id="preset-aog">
+                <div class="text-xs font-bold text-aog mb-1">🔴 AOG · Panic mode</div>
+                <div class="font-bold text-sm">Typed from a tarmac</div>
+                <div class="text-xs text-slate-500 mt-1">Typos, urgency, mobile shorthand</div>
+            </button>
+            <button onclick="loadPreset('routine')" class="preset-btn text-left p-4 border-2 border-slate-200 rounded-xl bg-white" id="preset-routine">
+                <div class="text-xs font-bold text-ok mb-1">🟢 Routine · Well-formed</div>
+                <div class="font-bold text-sm">Standard maintenance order</div>
+                <div class="text-xs text-slate-500 mt-1">Clean format, scheduled window</div>
+            </button>
+            <button onclick="loadPreset('bilingual')" class="preset-btn text-left p-4 border-2 border-slate-200 rounded-xl bg-white" id="preset-bilingual">
+                <div class="text-xs font-bold text-rush mb-1">🟡 Rush · Spanish</div>
+                <div class="font-bold text-sm">LatAm operator, urgent</div>
+                <div class="text-xs text-slate-500 mt-1">Bilingual, parts info embedded</div>
+            </button>
+        </div>
+    </section>
+
+    <!-- Main grid -->
+    <section class="grid md:grid-cols-2 gap-6">
+
+        <!-- Input -->
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-bold text-lg">Inbound Email</h2>
+                <span class="text-xs text-slate-500 font-mono">sales@partsaviation.com</span>
+            </div>
+            <textarea id="email-input" rows="18" class="w-full border border-slate-200 rounded-lg p-4 text-sm font-mono focus:border-primary focus:outline-none transition" placeholder="Paste an email here, or pick a preset above..."></textarea>
+            <button id="parse-btn" class="w-full mt-4 hero-gradient text-white px-6 py-3 rounded-lg font-bold uppercase tracking-widest text-sm hover:scale-[1.01] transition disabled:opacity-50">
+                <span class="material-symbols-outlined text-sm align-middle">auto_awesome</span>
+                Parse with AI
+            </button>
+        </div>
+
+        <!-- Output -->
+        <div class="space-y-4">
+            <!-- Status/progress -->
+            <div id="status" class="hidden bg-white rounded-xl border border-slate-200 p-6">
+                <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">pending</span>
+                    Processing...
+                </h3>
+                <div id="progress" class="space-y-2 text-sm"></div>
+            </div>
+
+            <!-- Results -->
+            <div id="results" class="hidden space-y-4"></div>
+
+            <!-- Empty -->
+            <div id="empty" class="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center">
+                <span class="material-symbols-outlined text-5xl text-slate-300">text_fields</span>
+                <p class="text-slate-500 mt-4">Pick a preset above or paste an email, then hit <strong>Parse with AI</strong>.</p>
+                <p class="text-xs text-slate-400 mt-2">Structured ticket will appear here in ~8 seconds.</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="py-8 px-6 md:px-12 border-t border-slate-200 text-center text-sm text-slate-500 mt-8">
+    Email RFQ Parser · MC Designs × Parts Aviation Solutions · <a href="https://mcdesignspr.com" class="text-primary hover:underline">mcdesignspr.com</a>
+</footer>
+
+<script>
+    const PRESETS = {
+        aog: `From: jen.walker@aerosur-charter.com
+To: sales@partsaviation.com
+Subject: URGENT AOG SJU need brake assy ASAP
+
+Hey guys,
+
+A320 grounded at SJU gate 12. Need L/H brake assembly C20620100 X2 serviceable or better. Any condition fine honestly just need wheels back on. Willing to pay courier whatever.
+
+Need it there by tonight if at all possible, latest tomorrow AM. Flight has 180 pax rebooked for 6am dep.
+
+Paying via wire same day. 8130 needed.
+
+Call my cell 954-555-0183 — email going to spam on my side rn
+
+Jen Walker
+AeroSur Charter
+AOG desk`,
+
+        routine: `From: mike.reyes@caribbean-cargo.com
+To: sales@partsaviation.com
+Subject: RFQ - Hydraulic actuator for 737-800 scheduled maintenance
+
+Good morning,
+
+Caribbean Air Cargo requesting a quote for the following part:
+
+Aircraft: Boeing 737-800
+Part Number: 65B45192-1
+Description: Hydraulic actuator (flight controls)
+ATA Chapter: 29 (Hydraulic Power)
+Condition Required: Overhauled (OH) preferred, Serviceable (SV) acceptable
+Quantity: 1 each
+Required By: Standard - within 2 weeks (next scheduled maintenance window)
+Delivery: MIA
+
+This is a planned replacement during our scheduled C-check. Please include Form 8130-3 documentation. Best price and lead time.
+
+Thanks,
+Mike Reyes
+Ops Manager, Caribbean Air Cargo
+305-555-0142`,
+
+        bilingual: `From: carlos.mendez@aerolinea-sur.mx
+To: sales@partsaviation.com
+Subject: Cotización urgente - APU APS5000 Challenger 604
+
+Buenos días,
+
+Necesitamos cotización urgente para siguiente parte:
+
+Aircraft: Bombardier Challenger 604
+P/N: APS5000
+Part: APU (Auxiliary Power Unit) - ATA 49
+Condición: OH o SV, preferible con 500+ horas disponibles
+Cantidad: 1
+
+Timeline: NEED WITHIN 72 HOURS. Tenemos aeronave en mantenimiento mayor en MTY y el APU actual no pasó inspección. No es AOG técnicamente pero cada día parado cuesta $15k USD en rentas y retrasos.
+
+Por favor incluir Form 8130-3 y detalles de trazabilidad. Podemos coordinar logística desde MIA o MEX.
+
+Responder en español o inglés, lo que sea más rápido.
+
+Saludos,
+Carlos Méndez
+Director de Mantenimiento
+Aerolínea Sur
++52 81 5555 0199`
+    };
+
+    const input = document.getElementById('email-input');
+    const parseBtn = document.getElementById('parse-btn');
+    const status = document.getElementById('status');
+    const progress = document.getElementById('progress');
+    const results = document.getElementById('results');
+    const empty = document.getElementById('empty');
+
+    function loadPreset(key) {
+        input.value = PRESETS[key];
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('preset-' + key).classList.add('active');
+        empty.classList.remove('hidden');
+        results.classList.add('hidden');
+        status.classList.add('hidden');
+    }
+
+    async function addProgress(text, delay = 300) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const line = document.createElement('div');
+                line.className = 'pulse-line text-slate-600';
+                line.innerHTML = `<span class="material-symbols-outlined text-ok text-base">check_circle</span><span>${text}</span>`;
+                progress.appendChild(line);
+                resolve();
+            }, delay);
+        });
+    }
+
+    parseBtn.addEventListener('click', async () => {
+        const email = input.value.trim();
+        if (!email) return alert('Paste or pick an email first.');
+
+        parseBtn.disabled = true;
+        parseBtn.textContent = 'Parsing...';
+        empty.classList.add('hidden');
+        results.classList.add('hidden');
+        status.classList.remove('hidden');
+        progress.innerHTML = '';
+
+        await addProgress('Email received by <code>sales@</code> inbox', 200);
+        await addProgress('Passed spam &amp; ops filter', 400);
+        await addProgress('Sent to Claude for extraction...', 500);
+
+        try {
+            const res = await fetch('/api/aviation-email-parse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Parse failed');
+
+            await addProgress('Structured data extracted', 400);
+            await addProgress(`Routed to <strong>${data.routing?.rep_name || 'team'}</strong>`, 400);
+            await addProgress(`Ticket <strong>${data.ticket_id}</strong> created in CRM`, 400);
+            await addProgress('Acknowledgment sent to customer', 300);
+
+            setTimeout(() => {
+                status.classList.add('hidden');
+                renderResults(data);
+                results.classList.remove('hidden');
+                parseBtn.disabled = false;
+                parseBtn.innerHTML = '<span class="material-symbols-outlined text-sm align-middle">auto_awesome</span> Parse with AI';
+            }, 600);
+        } catch (err) {
+            await addProgress(`<span class="text-red-600">Error: ${err.message}</span>`, 300);
+            parseBtn.disabled = false;
+            parseBtn.innerHTML = '<span class="material-symbols-outlined text-sm align-middle">auto_awesome</span> Parse with AI';
+        }
+    });
+
+    function renderResults(d) {
+        const urgencyColor = {
+            AOG: 'bg-aog text-white',
+            RUSH: 'bg-rush text-white',
+            STANDARD: 'bg-slate-100 text-slate-600'
+        }[d.classification?.urgency] || 'bg-slate-100 text-slate-600';
+
+        results.innerHTML = `
+            <!-- Summary card -->
+            <div class="bg-white rounded-xl border border-primary/30 p-6 space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                        <div class="text-xs text-slate-500 uppercase tracking-widest font-bold">Ticket created</div>
+                        <div class="font-mono font-black text-2xl text-primary">${d.ticket_id}</div>
+                    </div>
+                    <span class="text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-widest ${urgencyColor}">${d.classification?.urgency || 'STANDARD'}</span>
+                </div>
+            </div>
+
+            <!-- Extracted fields -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 class="font-bold text-lg mb-4">Extracted Fields</h3>
+                <div>
+                    ${[
+                        ['Company', d.extracted?.company],
+                        ['Contact', d.extracted?.contact_name],
+                        ['Email', d.extracted?.contact_email],
+                        ['Aircraft', d.extracted?.aircraft],
+                        ['Part Number', d.extracted?.part_number],
+                        ['Description', d.extracted?.part_description],
+                        ['ATA Chapter', d.classification?.ata_chapter_inferred],
+                        ['Condition', d.extracted?.condition],
+                        ['Quantity', d.extracted?.quantity],
+                        ['Required By', d.extracted?.required_by],
+                        ['AOG Flag', d.classification?.aog_flag ? '🔴 YES' : '🟢 No'],
+                        ['Language', d.extracted?.language],
+                    ].map(([k, v]) => v ? `
+                        <div class="extract-row">
+                            <div class="extract-label">${k}</div>
+                            <div class="extract-value">${v}</div>
+                        </div>` : '').join('')}
+                </div>
+            </div>
+
+            <!-- Routing -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 class="font-bold text-lg mb-3">Auto-Routed</h3>
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary">person</span>
+                    </div>
+                    <div>
+                        <div class="font-bold">${d.routing?.rep_name || '-'}</div>
+                        <div class="text-xs text-slate-500">${d.routing?.rep_role || ''}</div>
+                        <div class="text-sm text-slate-600 mt-1">${d.routing?.reason || ''}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer ack -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 class="font-bold text-lg mb-3">Customer Acknowledgment <span class="text-xs font-normal text-slate-500">(sent automatically)</span></h3>
+                <div class="bg-slate-50 border-l-4 border-primary p-4 text-sm text-slate-700 italic">
+                    ${d.customer_acknowledgment || '-'}
+                </div>
+            </div>
+
+            <!-- Quote draft -->
+            <div class="bg-white rounded-xl border border-slate-200 p-6">
+                <h3 class="font-bold text-lg mb-3">Quote Draft <span class="text-xs font-normal text-slate-500">(ready for rep to review/send)</span></h3>
+                <div class="text-xs text-slate-500 mb-2"><strong>Subject:</strong> ${d.quote_draft?.subject || '-'}</div>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm whitespace-pre-wrap leading-relaxed">${d.quote_draft?.body || '-'}</div>
+            </div>
+
+            <!-- Internal notes -->
+            ${d.internal_notes ? `
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
+                <div class="text-xs font-bold uppercase tracking-widest text-amber-700 mb-1">Internal note for rep</div>
+                <div class="text-amber-900">${d.internal_notes}</div>
+            </div>` : ''}
+
+            <!-- Raw JSON -->
+            <details class="bg-white rounded-xl border border-slate-200 p-4">
+                <summary class="cursor-pointer text-sm font-bold">View raw JSON (for N8N / API integration)</summary>
+                <pre class="terminal mt-4">${syntaxHighlight(JSON.stringify(d, null, 2))}</pre>
+            </details>
+        `;
+    }
+
+    function syntaxHighlight(json) {
+        return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (m) => {
+                let cls = 'num';
+                if (/^"/.test(m)) cls = /:$/.test(m) ? 'key' : 'str';
+                else if (/true|false/.test(m)) cls = 'bool';
+                else if (/null/.test(m)) cls = 'null';
+                return `<span class="${cls}">${m}</span>`;
+            });
+    }
+</script>
+
+</body>
+</html>

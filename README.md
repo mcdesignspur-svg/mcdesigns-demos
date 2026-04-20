@@ -32,7 +32,7 @@ mcdesigns-demos/
 | Cliente | URL | Propósito | Estado |
 |---|---|---|---|
 | WestSide Fitness | `/westside` | Pilar 1 (leads) + dashboard simulado | Activo |
-| Parts Aviation Solutions | `/aviation` | RFQ triage con AI (Claude + routing) | Activo |
+| Parts Aviation Solutions | `/aviation` + `/aviation/dashboard` + `/aviation/email-parse` | RFQ triage + Ops center + Email parser (Claude Haiku) | Activo |
 | Burbuja Social | `/burbuja` | CRM centralizado 3 líneas (agencia/foto/alquiler) + AI routing | Activo |
 
 ## Local dev
