@@ -5,7 +5,8 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/westside", "destination": "/westside/index.html" },
-    { "source": "/westside/dashboard", "destination": "/westside/dashboard.html" }
+    { "source": "/westside/dashboard", "destination": "/westside/dashboard.html" },
+    { "source": "/aviation", "destination": "/aviation/index.html" }
   ],
   "headers": [
     {

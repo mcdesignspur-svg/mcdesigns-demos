@@ -8,6 +8,7 @@ export default defineConfig({
                 main: resolve(__dirname, 'index.html'),
                 westside: resolve(__dirname, 'westside/index.html'),
                 westsideDashboard: resolve(__dirname, 'westside/dashboard.html'),
+                aviation: resolve(__dirname, 'aviation/index.html'),
             },
         },
     },

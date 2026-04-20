@@ -3,6 +3,7 @@ export default {
     content: [
         './*.html',
         './westside/**/*.html',
+        './aviation/**/*.html',
         './assets/**/*.js',
     ],
     theme: {
