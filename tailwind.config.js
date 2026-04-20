@@ -4,6 +4,7 @@ export default {
         './*.html',
         './westside/**/*.html',
         './aviation/**/*.html',
+        './burbuja/**/*.html',
         './assets/**/*.js',
     ],
     theme: {

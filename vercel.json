@@ -6,7 +6,9 @@
     { "source": "/", "destination": "/index.html" },
     { "source": "/westside", "destination": "/westside/index.html" },
     { "source": "/westside/dashboard", "destination": "/westside/dashboard.html" },
-    { "source": "/aviation", "destination": "/aviation/index.html" }
+    { "source": "/aviation", "destination": "/aviation/index.html" },
+    { "source": "/burbuja", "destination": "/burbuja/index.html" },
+    { "source": "/burbuja/dashboard", "destination": "/burbuja/dashboard.html" }
   ],
   "headers": [
     {

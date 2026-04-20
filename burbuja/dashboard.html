@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Burbuja Social · CRM Centralizado</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: "#FFF8F0",
+                        ink: "#1A1A2E",
+                        bubble: "#FF6B9D",
+                        violet: "#7B61FF",
+                        sky: "#BEE3F8",
+                        mint: "#C6F6D5",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Fraunces", "serif"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #FFF8F0; }
+        .gradient-bubble { background: linear-gradient(135deg, #FF6B9D 0%, #7B61FF 100%); }
+        .gradient-text {
+            background: linear-gradient(135deg, #FF6B9D 0%, #7B61FF 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .tab-btn.active { background: white; border-color: #7B61FF; color: #7B61FF; box-shadow: 0 4px 12px rgba(123, 97, 255, 0.15); }
+        .tab-btn:not(.active) { color: #1A1A2E; opacity: 0.6; }
+        .tab-btn:not(.active):hover { opacity: 1; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-ink font-sans antialiased min-h-screen">
+
+<!-- Demo Banner -->
+<div class="bg-bubble text-white text-xs font-bold uppercase tracking-widest py-2 text-center">
+    Demo privado · MC Designs × Burbuja Social · Dashboard simulado
+</div>
+
+<!-- Header -->
+<header class="bg-white border-b border-ink/5 px-6 md:px-12 py-5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 gradient-bubble rounded-full flex items-center justify-center">
+                <span class="font-display italic text-xl text-white font-black">B</span>
+            </div>
+            <div>
+                <div class="font-display italic text-lg font-black">Burbuja · CRM</div>
+                <div class="text-[10px] uppercase tracking-[0.2em] text-ink/40">Sistema Centralizado</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+            <span class="hidden md:inline text-ink/50">Liliana · Admin</span>
+            <a href="/burbuja" class="text-bubble hover:underline">← Landing</a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 md:px-12 py-8 space-y-8">
+
+    <!-- Title -->
+    <div class="space-y-2">
+        <h1 class="font-display text-4xl md:text-5xl">
+            Todo en <em class="italic gradient-text">un solo lugar</em>
+        </h1>
+        <p class="text-ink/60">Agencia + Fotografía + Alquiler de Estudio · tres líneas, una vista unificada.</p>
+    </div>
+
+    <!-- KPI Row -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-3xl p-5 shadow-lg shadow-bubble/5">
+            <div class="text-xs text-ink/50 uppercase tracking-widest font-bold">Leads hoy</div>
+            <div class="font-display text-4xl mt-2">18</div>
+            <div class="text-xs text-mint mt-1" style="color: #38A169;">↑ 200% vs promedio</div>
+        </div>
+        <div class="bg-white rounded-3xl p-5 shadow-lg shadow-violet/5">
+            <div class="text-xs text-ink/50 uppercase tracking-widest font-bold">Respuesta promedio</div>
+            <div class="font-display text-4xl mt-2">52<span class="text-lg text-ink/40">s</span></div>
+            <div class="text-xs mt-1" style="color: #38A169;">Meta: &lt;120s ✓</div>
+        </div>
+        <div class="bg-white rounded-3xl p-5 shadow-lg shadow-bubble/5">
+            <div class="text-xs text-ink/50 uppercase tracking-widest font-bold">Calendario ocupado</div>
+            <div class="font-display text-4xl mt-2">76<span class="text-lg text-ink/40">%</span></div>
+            <div class="text-xs text-ink/50 mt-1">Próximas 2 semanas</div>
+        </div>
+        <div class="bg-white rounded-3xl p-5 shadow-lg shadow-violet/5">
+            <div class="text-xs text-ink/50 uppercase tracking-widest font-bold">Revenue proyectado</div>
+            <div class="font-display text-4xl mt-2">$4.8<span class="text-lg text-ink/40">K</span></div>
+            <div class="text-xs mt-1" style="color: #38A169;">Semana en curso</div>
+        </div>
+    </section>
+
+    <!-- Tabs -->
+    <section>
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <h2 class="font-display text-2xl md:text-3xl">
+                Pipeline <em class="italic gradient-text">unificado</em>
+            </h2>
+            <div class="flex items-center gap-2 text-xs text-violet">
+                <span class="w-2 h-2 bg-violet rounded-full animate-pulse"></span>
+                <span class="uppercase tracking-widest font-bold">Live · 3 fuentes</span>
+            </div>
+        </div>
+
+        <!-- Tab buttons -->
+        <div class="flex gap-2 mb-6 flex-wrap bg-cream p-2 rounded-full w-fit">
+            <button class="tab-btn active" data-tab="todos">Todos (18)</button>
+            <button class="tab-btn" data-tab="agencia">✨ Agencia (6)</button>
+            <button class="tab-btn" data-tab="fotografia">📸 Fotografía (8)</button>
+            <button class="tab-btn" data-tab="alquiler">🎬 Alquiler (4)</button>
+        </div>
+
+        <!-- Tab: Todos -->
+        <div id="tab-todos" class="tab-content active">
+            <div class="bg-white rounded-3xl shadow-xl shadow-violet/5 overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-cream text-xs uppercase tracking-widest text-ink/50">
+                        <tr>
+                            <th class="text-left px-4 py-3 font-bold">Hora</th>
+                            <th class="text-left px-4 py-3 font-bold">Cliente</th>
+                            <th class="text-left px-4 py-3 font-bold">Línea</th>
+                            <th class="text-left px-4 py-3 font-bold">Detalle</th>
+                            <th class="text-left px-4 py-3 font-bold">Asignado</th>
+                            <th class="text-left px-4 py-3 font-bold">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-ink/5">
+                        <tr class="hover:bg-cream/50">
+                            <td class="px-4 py-3 text-ink/60">10:24am</td>
+                            <td class="px-4 py-3 font-semibold">Liliana R. (demo)</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 bg-bubble/10 text-bubble rounded-full text-xs font-bold">✨ Agencia</span></td>
+                            <td class="px-4 py-3 text-ink/60">Rebrand + social</td>
+                            <td class="px-4 py-3 text-ink/70">Equipo Agencia</td>
+                            <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-violet/20 text-violet rounded-full font-bold">WhatsApp enviado</span></td>
+                        </tr>
+                        <tr class="hover:bg-cream/50">
+                            <td class="px-4 py-3 text-ink/60">09:58am</td>
+                            <td class="px-4 py-3 font-semibold">Carolina M.</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 bg-violet/10 text-violet rounded-full text-xs font-bold">📸 Foto</span></td>
+                            <td class="px-4 py-3 text-ink/60">Sesión producto · skincare</td>
+                            <td class="px-4 py-3 text-ink/70">Liliana</td>
+                            <td class="px-4 py-3"><span class="text-xs px-2 py-1 rounded-full font-bold" style="background:#C6F6D5;color:#22543D;">Cotización enviada · $450</span></td>
+                        </tr>
+                        <tr class="hover:bg-cream/50">
+                            <td class="px-4 py-3 text-ink/60">09:31am</td>
+                            <td class="px-4 py-3 font-semibold">Javier P.</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold" style="background:#BEE3F8;color:#2C5282;">🎬 Alquiler</span></td>
+                            <td class="px-4 py-3 text-ink/60">4 hrs · fondo blanco</td>
+                            <td class="px-4 py-3 text-ink/70">Coord. Estudio</td>
+                            <td class="px-4 py-3"><span class="text-xs px-2 py-1 rounded-full font-bold" style="background:#C6F6D5;color:#22543D;">Pagado · $240</span></td>
+                        </tr>
+                        <tr class="hover:bg-cream/50">
+                            <td class="px-4 py-3 text-ink/60">08:52am</td>
+                            <td class="px-4 py-3 font-semibold">Marta S.</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 bg-violet/10 text-violet rounded-full text-xs font-bold">📸 Foto</span></td>
+                            <td class="px-4 py-3 text-ink/60">Retrato corporativo</td>
+                            <td class="px-4 py-3 text-ink/70">Liliana</td>
+                            <td class="px-4 py-3"><span class="text-xs px-2 py-1 bg-ink/10 text-ink/70 rounded-full font-bold">Follow-up d3</span></td>
+                        </tr>
+                        <tr class="hover:bg-cream/50">
+                            <td class="px-4 py-3 text-ink/60">08:14am</td>
+                            <td class="px-4 py-3 font-semibold">Gabriel T.</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 bg-bubble/10 text-bubble rounded-full text-xs font-bold">✨ Agencia</span></td>
+                            <td class="px-4 py-3 text-ink/60">Paid ads · IG + Meta</td>
+                            <td class="px-4 py-3 text-ink/70">Equipo Agencia</td>
+                            <td class="px-4 py-3"><span class="text-xs px-2 py-1 rounded-full font-bold" style="background:#C6F6D5;color:#22543D;">Cerrado · $800/mes</span></td>
+                        </tr>
+                        <tr class="hover:bg-cream/50">
+                            <td class="px-4 py-3 text-ink/60">Ayer 6:42pm</td>
+                            <td class="px-4 py-3 font-semibold">Ivelisse C.</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-bold" style="background:#BEE3F8;color:#2C5282;">🎬 Alquiler</span></td>
+                            <td class="px-4 py-3 text-ink/60">Día completo · evento</td>
+                            <td class="px-4 py-3 text-ink/70">Coord. Estudio</td>
+                            <td class="px-4 py-3"><span class="text-xs px-2 py-1 rounded-full font-bold" style="background:#C6F6D5;color:#22543D;">Confirmado · $1,600</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Agencia -->
+        <div id="tab-agencia" class="tab-content">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs text-bubble font-bold uppercase tracking-widest">Retainer activos</div>
+                    <div class="font-display text-4xl mt-2">12</div>
+                    <div class="text-xs text-ink/50 mt-1">$8,400 MRR</div>
+                </div>
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs text-bubble font-bold uppercase tracking-widest">Propuestas pendientes</div>
+                    <div class="font-display text-4xl mt-2">4</div>
+                    <div class="text-xs text-ink/50 mt-1">$3,200 potencial</div>
+                </div>
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs text-bubble font-bold uppercase tracking-widest">Tasks esta semana</div>
+                    <div class="font-display text-4xl mt-2">27</div>
+                    <div class="text-xs text-ink/50 mt-1">18 entregadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Fotografia -->
+        <div id="tab-fotografia" class="tab-content">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs text-violet font-bold uppercase tracking-widest">Sesiones esta semana</div>
+                    <div class="font-display text-4xl mt-2">9</div>
+                    <div class="text-xs text-ink/50 mt-1">$3,150 booked</div>
+                </div>
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs text-violet font-bold uppercase tracking-widest">Cotizaciones abiertas</div>
+                    <div class="font-display text-4xl mt-2">5</div>
+                    <div class="text-xs text-ink/50 mt-1">Promedio $320</div>
+                </div>
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs text-violet font-bold uppercase tracking-widest">Galerías pendientes</div>
+                    <div class="font-display text-4xl mt-2">3</div>
+                    <div class="text-xs text-ink/50 mt-1">Entregar esta semana</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Alquiler -->
+        <div id="tab-alquiler" class="tab-content">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs font-bold uppercase tracking-widest" style="color:#2C5282;">Bookings esta semana</div>
+                    <div class="font-display text-4xl mt-2">7</div>
+                    <div class="text-xs text-ink/50 mt-1">$1,840 revenue</div>
+                </div>
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs font-bold uppercase tracking-widest" style="color:#2C5282;">Ocupación</div>
+                    <div class="font-display text-4xl mt-2">82<span class="text-lg text-ink/40">%</span></div>
+                    <div class="text-xs text-ink/50 mt-1">Lun–Vie</div>
+                </div>
+                <div class="bg-white rounded-3xl p-5 shadow-lg">
+                    <div class="text-xs font-bold uppercase tracking-widest" style="color:#2C5282;">Próximo slot libre</div>
+                    <div class="font-display text-2xl mt-2 leading-tight">Mier 23<br/>3–7pm</div>
+                    <div class="text-xs text-ink/50 mt-1">Sugerir a leads</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline visual -->
+    <section class="bg-white rounded-3xl p-6 md:p-8 shadow-xl shadow-violet/5">
+        <h2 class="font-display text-2xl mb-5">Flujo <em class="italic gradient-text">automatizado</em></h2>
+        <div class="grid md:grid-cols-5 gap-3 text-center">
+            <div class="gradient-bubble text-white rounded-2xl p-4">
+                <div class="text-xs font-bold uppercase tracking-widest">1. Intake</div>
+                <div class="text-[11px] opacity-80 mt-2">Form · WhatsApp · IG DM</div>
+            </div>
+            <div class="gradient-bubble text-white rounded-2xl p-4">
+                <div class="text-xs font-bold uppercase tracking-widest">2. AI rutea</div>
+                <div class="text-[11px] opacity-80 mt-2">Clasifica línea + urgencia</div>
+            </div>
+            <div class="gradient-bubble text-white rounded-2xl p-4">
+                <div class="text-xs font-bold uppercase tracking-widest">3. WhatsApp</div>
+                <div class="text-[11px] opacity-80 mt-2">&lt;2 min respuesta</div>
+            </div>
+            <div class="gradient-bubble text-white rounded-2xl p-4">
+                <div class="text-xs font-bold uppercase tracking-widest">4. Onboarding</div>
+                <div class="text-[11px] opacity-80 mt-2">Contrato · depósito · bienvenida</div>
+            </div>
+            <div class="gradient-bubble text-white rounded-2xl p-4">
+                <div class="text-xs font-bold uppercase tracking-widest">5. Entrega</div>
+                <div class="text-[11px] opacity-80 mt-2">Proyecto en CRM · follow-up</div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="py-8 px-6 md:px-12 border-t border-ink/5 text-center text-sm text-ink/40 mt-8">
+    Dashboard simulado · MC Designs × Burbuja Social · <a href="https://mcdesignspr.com" class="text-bubble hover:underline">mcdesignspr.com</a>
+</footer>
+
+<script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>

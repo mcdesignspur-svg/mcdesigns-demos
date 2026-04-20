@@ -33,6 +33,7 @@ mcdesigns-demos/
 |---|---|---|---|
 | WestSide Fitness | `/westside` | Pilar 1 (leads) + dashboard simulado | Activo |
 | Parts Aviation Solutions | `/aviation` | RFQ triage con AI (Claude + routing) | Activo |
+| Burbuja Social | `/burbuja` | CRM centralizado 3 líneas (agencia/foto/alquiler) + AI routing | Activo |
 
 ## Local dev
 
