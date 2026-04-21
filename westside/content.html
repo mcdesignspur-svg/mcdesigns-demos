@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>WestSide Content Studio · AI Generator</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: "#0A0A0A",
+                        offblack: "#121212",
+                        panel: "#1A1A1A",
+                        brand: "#E63946",
+                        brandDark: "#C41E2C",
+                        accent: "#FFB800",
+                        cream: "#F5F1E8",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Anton", "Impact", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0A0A0A; }
+        .glass {
+            backdrop-filter: blur(20px);
+            background: rgba(26, 26, 26, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .pulse-dot::before {
+            content: '';
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .type-chip {
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .type-chip.active {
+            background: #E63946;
+            color: white;
+            border-color: #E63946;
+        }
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.04) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .copy-btn:hover { background: rgba(230,57,70,0.2); }
+    </style>
+</head>
+<body class="text-white font-sans antialiased">
+
+<!-- Demo Banner -->
+<div class="bg-accent text-ink text-xs font-bold uppercase tracking-widest py-2 text-center">
+    Demo privado · MC Designs × WestSide Fitness · No compartir
+</div>
+
+<!-- Header -->
+<header class="border-b border-white/10 px-6 md:px-10 py-5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand rounded-full flex items-center justify-center font-display text-xl">W</div>
+            <div>
+                <div class="font-display text-xl tracking-wide leading-none">WESTSIDE</div>
+                <div class="text-[10px] uppercase tracking-widest text-white/50 mt-1">Content Studio · AI</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-6 text-sm">
+            <span class="pulse-dot text-green-400 text-xs uppercase tracking-widest font-bold">Claude Haiku 4.5</span>
+            <a href="/westside/calendar" class="border border-white/20 hover:border-brand hover:text-brand px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition">
+                Calendar →
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-6 md:px-10 py-10">
+
+    <!-- Title -->
+    <div class="mb-10">
+        <span class="inline-block px-3 py-1 bg-brand/20 border border-brand text-brand text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">
+            Content Generator
+        </span>
+        <h1 class="font-display text-5xl md:text-6xl tracking-wide leading-none">
+            DEL TEMA AL POST<br/>
+            <span class="text-brand">EN 6 SEGUNDOS</span>.
+        </h1>
+        <p class="text-white/60 mt-4 max-w-2xl">
+            Escribe un tema. La AI genera hooks, caption, script de Reel y CTA — todo en voz WestSide y listo pa' publicar.
+        </p>
+    </div>
+
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <!-- LEFT: Input panel -->
+        <aside class="lg:col-span-2">
+            <div class="glass rounded-2xl p-6 space-y-5 lg:sticky lg:top-6">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-2 text-white/70">Ubicación</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" data-loc="Caguas" class="type-chip active text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40">Caguas</button>
+                        <button type="button" data-loc="San Juan" class="type-chip text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40">San Juan</button>
+                        <button type="button" data-loc="Bayamón" class="type-chip text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40">Bayamón</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-2 text-white/70">Tipo de post</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" data-type="Motivación" class="type-chip active text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40">Motivación</button>
+                        <button type="button" data-type="Promo" class="type-chip text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40">Promo</button>
+                        <button type="button" data-type="Testimonio" class="type-chip text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40">Testimonio</button>
+                        <button type="button" data-type="Tip" class="type-chip text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40">Tip</button>
+                        <button type="button" data-type="Evento" class="type-chip text-xs font-bold uppercase tracking-widest py-3 rounded-lg border border-white/10 bg-black/40 col-span-2">Evento</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-2 text-white/70">Formato</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" data-format="Reel" class="type-chip active text-xs font-bold uppercase tracking-widest py-2.5 rounded-lg border border-white/10 bg-black/40">Reel</button>
+                        <button type="button" data-format="Carrusel" class="type-chip text-xs font-bold uppercase tracking-widest py-2.5 rounded-lg border border-white/10 bg-black/40">Carrusel</button>
+                        <button type="button" data-format="Static" class="type-chip text-xs font-bold uppercase tracking-widest py-2.5 rounded-lg border border-white/10 bg-black/40">Static</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-2 text-white/70">Tema / Ángulo</label>
+                    <textarea id="topic" rows="3" placeholder="Ej: lunes de piernas — por qué no puedes skipear leg day"
+                        class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:border-brand focus:outline-none transition resize-none"></textarea>
+
+                    <!-- Preset examples -->
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <button type="button" data-preset="lunes de piernas — por qué no puedes skipear leg day" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Leg day</button>
+                        <button type="button" data-preset="María bajó 22 libras en 3 meses entrenando 4 veces por semana" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Testimonio</button>
+                        <button type="button" data-preset="Free trial de 7 días gratis — empieza esta semana" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Free trial</button>
+                        <button type="button" data-preset="3 errores comunes haciendo sentadilla que sabotean tus gainz" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Form tips</button>
+                    </div>
+                </div>
+
+                <button id="generate-btn" class="w-full bg-brand hover:bg-brandDark px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm transition disabled:opacity-50 flex items-center justify-center gap-2">
+                    <span id="btn-label">Generar Contenido</span>
+                    <span id="btn-time" class="text-[10px] text-white/70 font-mono"></span>
+                </button>
+
+                <div class="text-[10px] text-white/40 text-center uppercase tracking-widest">
+                    Powered by Claude · Voz WestSide PR
+                </div>
+            </div>
+        </aside>
+
+        <!-- RIGHT: Output -->
+        <main class="lg:col-span-3">
+            <!-- Empty state -->
+            <div id="empty-state" class="glass rounded-2xl p-12 text-center space-y-4">
+                <div class="text-6xl opacity-20">⚡</div>
+                <h3 class="font-display text-3xl tracking-wide">LISTO PA' GENERAR</h3>
+                <p class="text-white/50 max-w-md mx-auto">
+                    Pick ubicación, tipo de post y escribe el tema. La AI te entrega todo el asset pack en segundos.
+                </p>
+                <div class="pt-4 text-[10px] text-white/40 uppercase tracking-widest">
+                    Hooks · Captions · Reel Script · Hashtags · ManyChat CTA · Image Prompt
+                </div>
+            </div>
+
+            <!-- Loading state -->
+            <div id="loading-state" class="hidden space-y-4">
+                <div class="glass rounded-2xl p-6 space-y-3">
+                    <div class="h-4 w-32 shimmer rounded"></div>
+                    <div class="h-12 shimmer rounded"></div>
+                    <div class="h-12 shimmer rounded"></div>
+                    <div class="h-12 shimmer rounded"></div>
+                </div>
+                <div class="glass rounded-2xl p-6 space-y-3">
+                    <div class="h-4 w-32 shimmer rounded"></div>
+                    <div class="h-24 shimmer rounded"></div>
+                </div>
+                <div class="text-center text-xs text-white/50 uppercase tracking-widest pulse-dot">
+                    Claude está escribiendo tu contenido...
+                </div>
+            </div>
+
+            <!-- Result state -->
+            <div id="result" class="hidden space-y-5"></div>
+
+            <!-- Error state -->
+            <div id="error-state" class="hidden glass rounded-2xl p-6 border border-red-500/30 text-red-300"></div>
+        </main>
+
+    </div>
+</div>
+
+<footer class="py-8 px-6 md:px-10 border-t border-white/10 text-center text-sm text-white/40 mt-10">
+    Demo site construido por <a href="https://mcdesignspr.com" class="text-brand hover:underline">MC Designs</a>
+</footer>
+
+<script type="module">
+    const state = {
+        location: 'Caguas',
+        postType: 'Motivación',
+        format: 'Reel',
+    };
+
+    // Chip selection
+    document.querySelectorAll('[data-loc]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-loc]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.location = btn.dataset.loc;
+        });
+    });
+    document.querySelectorAll('[data-type]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.postType = btn.dataset.type;
+        });
+    });
+    document.querySelectorAll('[data-format]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-format]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.format = btn.dataset.format;
+        });
+    });
+
+    // Presets
+    const topicEl = document.getElementById('topic');
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            topicEl.value = btn.dataset.preset;
+            topicEl.focus();
+        });
+    });
+
+    const genBtn = document.getElementById('generate-btn');
+    const btnLabel = document.getElementById('btn-label');
+    const btnTime = document.getElementById('btn-time');
+    const empty = document.getElementById('empty-state');
+    const loading = document.getElementById('loading-state');
+    const result = document.getElementById('result');
+    const errorBox = document.getElementById('error-state');
+
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function copyBtn(text, label) {
+        const id = 'cp-' + Math.random().toString(36).slice(2, 8);
+        return `<button type="button" data-copy-id="${id}" class="copy-btn text-[10px] uppercase tracking-widest text-white/50 hover:text-brand border border-white/10 px-2.5 py-1 rounded transition">${label || 'Copiar'}</button><textarea id="${id}" class="hidden">${esc(text)}</textarea>`;
+    }
+
+    function bindCopy() {
+        document.querySelectorAll('[data-copy-id]').forEach(btn => {
+            if (btn.dataset.bound) return;
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', () => {
+                const ta = document.getElementById(btn.dataset.copyId);
+                navigator.clipboard.writeText(ta.value).then(() => {
+                    const prev = btn.textContent;
+                    btn.textContent = '✓ Copiado';
+                    btn.classList.add('text-green-400');
+                    setTimeout(() => { btn.textContent = prev; btn.classList.remove('text-green-400'); }, 1500);
+                });
+            });
+        });
+    }
+
+    function render(data, elapsedMs) {
+        const hooksHtml = data.hooks.map((h, i) => `
+            <div class="flex items-start gap-3 p-3 bg-black/30 border border-white/5 rounded-lg">
+                <span class="font-mono text-[10px] text-brand font-bold mt-0.5">#${i+1}</span>
+                <p class="flex-1 text-sm">${esc(h)}</p>
+                ${copyBtn(h)}
+            </div>
+        `).join('');
+
+        const script = data.reel_script || {};
+        const beats = [
+            ['HOOK · 0-2s', script.hook],
+            ['BEAT 1 · 2-6s', script.beat_1],
+            ['BEAT 2 · 6-10s', script.beat_2],
+            ['BEAT 3 · 10-13s', script.beat_3],
+            ['CTA · 13-15s', script.cta],
+        ];
+        const scriptHtml = beats.map(([label, b]) => b ? `
+            <div class="border-l-2 border-brand pl-4 py-1">
+                <div class="text-[10px] font-mono text-brand uppercase tracking-widest mb-1">${label}</div>
+                <p class="text-sm text-white/90 mb-1"><span class="text-white/40 text-[10px] uppercase tracking-widest">VO:</span> ${esc(b.voiceover || '')}</p>
+                <p class="text-xs text-white/60"><span class="text-white/40 text-[10px] uppercase tracking-widest">Visual:</span> ${esc(b.visual || '')}</p>
+            </div>
+        ` : '').join('');
+
+        const fullScript = beats.map(([l,b]) => b ? `${l}\nVO: ${b.voiceover}\nVisual: ${b.visual}` : '').filter(Boolean).join('\n\n');
+
+        const hashtagsLine = (data.hashtags || []).join(' ');
+
+        result.innerHTML = `
+            <!-- Meta -->
+            <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-3 py-1.5 bg-brand text-white rounded-full font-bold uppercase tracking-widest text-[10px]">${esc(state.postType)}</span>
+                    <span class="px-3 py-1.5 bg-white/10 rounded-full uppercase tracking-widest text-[10px]">${esc(state.location)}</span>
+                    <span class="px-3 py-1.5 bg-white/10 rounded-full uppercase tracking-widest text-[10px]">${esc(state.format)}</span>
+                    <span class="px-3 py-1.5 border border-accent/40 text-accent rounded-full uppercase tracking-widest text-[10px]">⏱ ${esc(data.best_time || '—')}</span>
+                </div>
+                <span class="text-white/40 font-mono text-[10px]">generated in ${(elapsedMs/1000).toFixed(1)}s</span>
+            </div>
+
+            <!-- Hooks -->
+            <div class="glass rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display text-xl tracking-wide">HOOKS · 3 VARIANTES A/B</h3>
+                    <span class="text-[10px] uppercase tracking-widest text-white/40">Pattern interrupts</span>
+                </div>
+                <div class="space-y-2">${hooksHtml}</div>
+            </div>
+
+            <!-- Captions -->
+            <div class="glass rounded-2xl p-6 space-y-5">
+                <h3 class="font-display text-xl tracking-wide">CAPTIONS</h3>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-white/60">Short · Hook-first</span>
+                        ${copyBtn(data.caption_short)}
+                    </div>
+                    <div class="bg-black/40 border border-white/10 rounded-lg p-4 text-sm whitespace-pre-line">${esc(data.caption_short)}</div>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-white/60">Medium · Narrative arc</span>
+                        ${copyBtn(data.caption_medium)}
+                    </div>
+                    <div class="bg-black/40 border border-white/10 rounded-lg p-4 text-sm whitespace-pre-line">${esc(data.caption_medium)}</div>
+                </div>
+            </div>
+
+            <!-- Reel script -->
+            <div class="glass rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display text-xl tracking-wide">REEL SCRIPT · 15s</h3>
+                    ${copyBtn(fullScript, 'Copiar script')}
+                </div>
+                <div class="space-y-4">${scriptHtml}</div>
+            </div>
+
+            <!-- ManyChat + Hashtags -->
+            <div class="grid md:grid-cols-2 gap-5">
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-display text-xl tracking-wide mb-4">MANYCHAT CTA</h3>
+                    <div class="bg-black/40 border border-brand/30 rounded-lg p-4">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-brand mb-2">Keyword</div>
+                        <div class="font-mono text-2xl font-bold mb-4">${esc(data.manychat?.keyword || '')}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Trigger line</div>
+                        <p class="text-sm text-white/90">${esc(data.manychat?.trigger_line || '')}</p>
+                    </div>
+                </div>
+                <div class="glass rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-display text-xl tracking-wide">HASHTAGS</h3>
+                        ${copyBtn(hashtagsLine)}
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        ${(data.hashtags || []).map(h => `<span class="text-xs bg-black/40 border border-white/10 px-2.5 py-1 rounded-full text-white/80">${esc(h)}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image prompt -->
+            ${data.image_prompt ? `
+            <div class="glass rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-display text-xl tracking-wide">IMAGE PROMPT · NANO BANANA READY</h3>
+                    ${copyBtn(data.image_prompt)}
+                </div>
+                <div class="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white/80 font-mono text-xs leading-relaxed">${esc(data.image_prompt)}</div>
+            </div>` : ''}
+
+            <!-- Actions -->
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button id="add-calendar" class="bg-accent text-ink px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs transition hover:opacity-90">
+                    + Agregar al Calendar
+                </button>
+                <button id="regen" class="border border-white/20 hover:border-brand hover:text-brand px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs transition">
+                    ↻ Regenerar
+                </button>
+                <a href="/westside/calendar" class="border border-white/20 hover:border-brand hover:text-brand px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs transition">
+                    Ver Calendar →
+                </a>
+            </div>
+        `;
+
+        bindCopy();
+        document.getElementById('regen').addEventListener('click', () => genBtn.click());
+        document.getElementById('add-calendar').addEventListener('click', function() {
+            this.textContent = '✓ Agregado al calendar';
+            this.classList.remove('bg-accent');
+            this.classList.add('bg-green-500', 'text-white');
+        });
+    }
+
+    genBtn.addEventListener('click', async () => {
+        const topic = topicEl.value.trim();
+        if (topic.length < 3) {
+            topicEl.focus();
+            topicEl.classList.add('border-brand');
+            setTimeout(() => topicEl.classList.remove('border-brand'), 1500);
+            return;
+        }
+
+        empty.classList.add('hidden');
+        result.classList.add('hidden');
+        errorBox.classList.add('hidden');
+        loading.classList.remove('hidden');
+        genBtn.disabled = true;
+        btnLabel.textContent = 'Generando...';
+        btnTime.textContent = '';
+
+        const started = Date.now();
+        const timer = setInterval(() => {
+            btnTime.textContent = ((Date.now() - started) / 1000).toFixed(1) + 's';
+        }, 100);
+
+        try {
+            const res = await fetch('/api/westside-content', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...state, topic }),
+            });
+            const data = await res.json();
+            clearInterval(timer);
+            const elapsed = Date.now() - started;
+
+            if (!res.ok) throw new Error(data.error || 'Error desconocido');
+
+            loading.classList.add('hidden');
+            result.classList.remove('hidden');
+            render(data, elapsed);
+            result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (err) {
+            clearInterval(timer);
+            loading.classList.add('hidden');
+            errorBox.classList.remove('hidden');
+            errorBox.textContent = 'Error: ' + err.message;
+        } finally {
+            genBtn.disabled = false;
+            btnLabel.textContent = 'Generar Contenido';
+            btnTime.textContent = '';
+        }
+    });
+</script>
+
+</body>
+</html>

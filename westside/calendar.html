@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>WestSide · Content Calendar</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Anton&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: "#0A0A0A",
+                        offblack: "#121212",
+                        panel: "#1A1A1A",
+                        brand: "#E63946",
+                        brandDark: "#C41E2C",
+                        accent: "#FFB800",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Anton", "Impact", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0A0A0A; }
+        .glass {
+            backdrop-filter: blur(20px);
+            background: rgba(26, 26, 26, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .pulse-dot::before {
+            content: '';
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .loc-caguas { border-left: 3px solid #E63946; }
+        .loc-sanjuan { border-left: 3px solid #FFB800; }
+        .loc-bayamon { border-left: 3px solid #3B82F6; }
+    </style>
+</head>
+<body class="text-white font-sans antialiased">
+
+<!-- Demo Banner -->
+<div class="bg-accent text-ink text-xs font-bold uppercase tracking-widest py-2 text-center">
+    Demo privado · MC Designs × WestSide Fitness · No compartir
+</div>
+
+<!-- Header -->
+<header class="border-b border-white/10 px-6 md:px-10 py-5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand rounded-full flex items-center justify-center font-display text-xl">W</div>
+            <div>
+                <div class="font-display text-xl tracking-wide leading-none">WESTSIDE</div>
+                <div class="text-[10px] uppercase tracking-widest text-white/50 mt-1">Content Calendar · Abril 2026</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+            <span class="pulse-dot text-green-400 text-xs uppercase tracking-widest font-bold">Live · Synced to IG</span>
+            <a href="/westside/content" class="bg-brand hover:bg-brandDark px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition">
+                + Generar post
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-6 md:px-10 py-8 space-y-8">
+
+    <!-- KPI row -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="glass rounded-2xl p-5">
+            <div class="text-[10px] uppercase tracking-widest text-white/50 mb-2">Posts este mes</div>
+            <div class="font-display text-4xl text-white">22</div>
+            <div class="text-xs text-green-400 mt-1">↑ 340% vs marzo</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+            <div class="text-[10px] uppercase tracking-widest text-white/50 mb-2">Engagement avg</div>
+            <div class="font-display text-4xl text-accent">6.8%</div>
+            <div class="text-xs text-green-400 mt-1">↑ 2.1pts vs benchmark</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+            <div class="text-[10px] uppercase tracking-widest text-white/50 mb-2">Top ubicación</div>
+            <div class="font-display text-4xl text-brand">CAGUAS</div>
+            <div class="text-xs text-white/60 mt-1">11.2% engagement</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+            <div class="text-[10px] uppercase tracking-widest text-white/50 mb-2">ManyChat triggers</div>
+            <div class="font-display text-4xl text-white">148</div>
+            <div class="text-xs text-green-400 mt-1">↑ 47 esta semana</div>
+        </div>
+    </section>
+
+    <!-- Week header -->
+    <section class="flex items-center justify-between">
+        <div>
+            <h2 class="font-display text-3xl tracking-wide">SEMANA 20 – 26 ABRIL</h2>
+            <p class="text-sm text-white/60 mt-1">5 posts programados · Balance Mon/Tue/Thu/Fri/Sat · Mix 3 ubicaciones</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-brand rounded-full"></span> Caguas</span>
+            <span class="flex items-center gap-2 ml-3"><span class="w-3 h-3 bg-accent rounded-full"></span> San Juan</span>
+            <span class="flex items-center gap-2 ml-3"><span class="w-3 h-3 bg-blue-500 rounded-full"></span> Bayamón</span>
+        </div>
+    </section>
+
+    <!-- Calendar week -->
+    <section class="grid grid-cols-1 md:grid-cols-7 gap-3">
+        <!-- Mon -->
+        <div class="glass rounded-2xl p-4 loc-caguas min-h-[260px]">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <div class="font-display text-2xl leading-none">LUN</div>
+                    <div class="text-[10px] uppercase tracking-widest text-white/50 mt-1">21 Abr · 6:00pm</div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full font-bold uppercase tracking-widest">Publicado</span>
+            </div>
+            <div class="text-[10px] font-bold uppercase tracking-widest text-brand mb-2">Motivación · Reel · Caguas</div>
+            <p class="text-xs text-white/80 mb-3 leading-relaxed">"Lunes no es castigo — es reset. Échale 60 min y verás…"</p>
+            <div class="text-[10px] text-white/50 font-mono space-y-0.5">
+                <div>🎯 ENTRENA · 34 triggers</div>
+                <div>❤️ 412 · 💬 38 · 🔄 52</div>
+            </div>
+        </div>
+
+        <!-- Tue -->
+        <div class="glass rounded-2xl p-4 loc-sanjuan min-h-[260px]">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <div class="font-display text-2xl leading-none">MAR</div>
+                    <div class="text-[10px] uppercase tracking-widest text-white/50 mt-1">22 Abr · 7:30am</div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full font-bold uppercase tracking-widest">Publicado</span>
+            </div>
+            <div class="text-[10px] font-bold uppercase tracking-widest text-accent mb-2">Tip · Carrusel · San Juan</div>
+            <p class="text-xs text-white/80 mb-3 leading-relaxed">"3 errores en sentadilla que sabotean tus gainz"</p>
+            <div class="text-[10px] text-white/50 font-mono space-y-0.5">
+                <div>🎯 TIP · 28 triggers</div>
+                <div>❤️ 287 · 💬 22 · 🔄 41</div>
+            </div>
+        </div>
+
+        <!-- Wed · skip -->
+        <div class="rounded-2xl p-4 border border-dashed border-white/10 min-h-[260px] flex flex-col items-center justify-center text-white/30">
+            <div class="font-display text-2xl leading-none">MIÉ</div>
+            <div class="text-[10px] uppercase tracking-widest mt-1">23 Abr</div>
+            <div class="text-[10px] uppercase tracking-widest mt-4 text-white/40">Rest day</div>
+        </div>
+
+        <!-- Thu -->
+        <div class="glass rounded-2xl p-4 loc-bayamon min-h-[260px]">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <div class="font-display text-2xl leading-none">JUE</div>
+                    <div class="text-[10px] uppercase tracking-widest text-white/50 mt-1">24 Abr · 12:00pm</div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent rounded-full font-bold uppercase tracking-widest">Aprobado</span>
+            </div>
+            <div class="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-2">Testimonio · Reel · Bayamón</div>
+            <p class="text-xs text-white/80 mb-3 leading-relaxed">"María bajó 22 lb en 3 meses — su rutina exacta"</p>
+            <div class="text-[10px] text-white/50 font-mono space-y-0.5">
+                <div>🎯 ENTRENA · pending</div>
+                <div>⏱ queued · Meta Scheduler</div>
+            </div>
+        </div>
+
+        <!-- Fri -->
+        <div class="glass rounded-2xl p-4 loc-caguas min-h-[260px]">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <div class="font-display text-2xl leading-none">VIE</div>
+                    <div class="text-[10px] uppercase tracking-widest text-white/50 mt-1">25 Abr · 6:00pm</div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent rounded-full font-bold uppercase tracking-widest">Aprobado</span>
+            </div>
+            <div class="text-[10px] font-bold uppercase tracking-widest text-brand mb-2">Promo · Static · Caguas</div>
+            <p class="text-xs text-white/80 mb-3 leading-relaxed">"Free trial 7 días — sin tarjeta, sin compromiso"</p>
+            <div class="text-[10px] text-white/50 font-mono space-y-0.5">
+                <div>🎯 GRATIS · pending</div>
+                <div>⏱ queued · Meta Scheduler</div>
+            </div>
+        </div>
+
+        <!-- Sat -->
+        <div class="glass rounded-2xl p-4 loc-sanjuan min-h-[260px]">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <div class="font-display text-2xl leading-none">SÁB</div>
+                    <div class="text-[10px] uppercase tracking-widest text-white/50 mt-1">26 Abr · 10:00am</div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 bg-white/10 text-white/70 rounded-full font-bold uppercase tracking-widest">Draft</span>
+            </div>
+            <div class="text-[10px] font-bold uppercase tracking-widest text-accent mb-2">Evento · Reel · San Juan</div>
+            <p class="text-xs text-white/80 mb-3 leading-relaxed">"Clase especial HIIT sábado 10am — solo 20 spots"</p>
+            <div class="text-[10px] text-white/50 font-mono space-y-0.5">
+                <div>🎯 CLASE · pending</div>
+                <div>✎ Pendiente review Miguel</div>
+            </div>
+        </div>
+
+        <!-- Sun · skip -->
+        <div class="rounded-2xl p-4 border border-dashed border-white/10 min-h-[260px] flex flex-col items-center justify-center text-white/30">
+            <div class="font-display text-2xl leading-none">DOM</div>
+            <div class="text-[10px] uppercase tracking-widest mt-1">27 Abr</div>
+            <div class="text-[10px] uppercase tracking-widest mt-4 text-white/40">Community repost</div>
+        </div>
+    </section>
+
+    <!-- Pipeline flow -->
+    <section class="glass rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="font-display text-2xl tracking-wide">CONTENT PIPELINE · ESTA SEMANA</h3>
+            <span class="text-[10px] uppercase tracking-widest text-white/50">7 posts en flow</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div class="bg-black/40 border border-white/10 rounded-xl p-4">
+                <div class="text-[10px] uppercase tracking-widest text-white/50 mb-2">1 · Idea</div>
+                <div class="font-display text-3xl mb-1">3</div>
+                <div class="text-[10px] text-white/60">Topics en queue</div>
+            </div>
+            <div class="bg-black/40 border border-white/10 rounded-xl p-4">
+                <div class="text-[10px] uppercase tracking-widest text-white/50 mb-2">2 · AI Draft</div>
+                <div class="font-display text-3xl mb-1">2</div>
+                <div class="text-[10px] text-white/60">Generados hoy</div>
+            </div>
+            <div class="bg-black/40 border border-accent/30 rounded-xl p-4">
+                <div class="text-[10px] uppercase tracking-widest text-accent mb-2">3 · Review</div>
+                <div class="font-display text-3xl mb-1 text-accent">1</div>
+                <div class="text-[10px] text-white/60">Espera approval Miguel</div>
+            </div>
+            <div class="bg-black/40 border border-blue-400/30 rounded-xl p-4">
+                <div class="text-[10px] uppercase tracking-widest text-blue-400 mb-2">4 · Scheduled</div>
+                <div class="font-display text-3xl mb-1 text-blue-400">2</div>
+                <div class="text-[10px] text-white/60">Meta Scheduler</div>
+            </div>
+            <div class="bg-black/40 border border-green-500/30 rounded-xl p-4">
+                <div class="text-[10px] uppercase tracking-widest text-green-400 mb-2">5 · Published</div>
+                <div class="font-display text-3xl mb-1 text-green-400">22</div>
+                <div class="text-[10px] text-white/60">Abril (MTD)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location breakdown -->
+    <section class="grid md:grid-cols-3 gap-4">
+        <div class="glass rounded-2xl p-5 loc-caguas">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="font-display text-xl">CAGUAS</h4>
+                <span class="text-[10px] font-mono text-brand">8 posts</span>
+            </div>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between"><span class="text-white/60">Engagement avg</span><span class="font-mono text-green-400">11.2%</span></div>
+                <div class="flex justify-between"><span class="text-white/60">ManyChat triggers</span><span class="font-mono">61</span></div>
+                <div class="flex justify-between"><span class="text-white/60">Top post</span><span class="font-mono text-accent">Leg day reel</span></div>
+            </div>
+        </div>
+        <div class="glass rounded-2xl p-5 loc-sanjuan">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="font-display text-xl">SAN JUAN</h4>
+                <span class="text-[10px] font-mono text-accent">7 posts</span>
+            </div>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between"><span class="text-white/60">Engagement avg</span><span class="font-mono text-green-400">5.9%</span></div>
+                <div class="flex justify-between"><span class="text-white/60">ManyChat triggers</span><span class="font-mono">48</span></div>
+                <div class="flex justify-between"><span class="text-white/60">Top post</span><span class="font-mono text-accent">Tip sentadilla</span></div>
+            </div>
+        </div>
+        <div class="glass rounded-2xl p-5 loc-bayamon">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="font-display text-xl">BAYAMÓN</h4>
+                <span class="text-[10px] font-mono text-blue-400">7 posts</span>
+            </div>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between"><span class="text-white/60">Engagement avg</span><span class="font-mono text-green-400">3.4%</span></div>
+                <div class="flex justify-between"><span class="text-white/60">ManyChat triggers</span><span class="font-mono">39</span></div>
+                <div class="flex justify-between"><span class="text-white/60">Top post</span><span class="font-mono text-accent">Testimonio María</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA footer -->
+    <section class="glass rounded-2xl p-8 text-center">
+        <h3 class="font-display text-3xl tracking-wide mb-2">20 MIN = 1 SEMANA DE CONTENIDO</h3>
+        <p class="text-white/60 max-w-xl mx-auto mb-6">
+            Cada post arriba fue generado por AI en menos de 10 segundos. Miguel revisa, aprueba con un click, y Meta Scheduler lo publica automático.
+        </p>
+        <a href="/westside/content" class="inline-block bg-brand hover:bg-brandDark px-8 py-3.5 rounded-full font-bold uppercase tracking-widest text-sm transition">
+            + Generar nuevo post
+        </a>
+    </section>
+
+</div>
+
+<footer class="py-8 px-6 md:px-10 border-t border-white/10 text-center text-sm text-white/40 mt-10">
+    Demo site construido por <a href="https://mcdesignspr.com" class="text-brand hover:underline">MC Designs</a>
+</footer>
+
+</body>
+</html>
