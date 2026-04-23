@@ -112,6 +112,10 @@
             <div class="hidden md:flex items-center gap-2 ml-4 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-xs live-dot">
                 <span class="font-bold uppercase tracking-widest text-green-700">All systems live</span>
             </div>
+            <div class="hidden md:flex items-center gap-1 text-[11px] text-slate-500 font-mono">
+                <span class="material-symbols-outlined text-sm">sync</span>
+                <span>Updated <span id="last-updated">just now</span></span>
+            </div>
         </nav>
     </div>
 </header>
@@ -410,6 +414,22 @@
     }
     tick('aog1', 4 * 3600 + 23 * 60 + 11);
     tick('aog2', 12 * 3600 + 47 * 60 + 33);
+
+    // "Updated Xs ago" timestamp — resets every ~12-45s to feel live
+    (function livenessClock() {
+        const el = document.getElementById('last-updated');
+        let sec = 0;
+        let nextReset = 12 + Math.floor(Math.random() * 34);
+        setInterval(() => {
+            sec += 1;
+            if (sec >= nextReset) {
+                sec = 0;
+                nextReset = 12 + Math.floor(Math.random() * 34);
+            }
+            if (!el) return;
+            el.textContent = sec < 5 ? 'just now' : `${sec}s ago`;
+        }, 1000);
+    })();
 </script>
 
 </body>

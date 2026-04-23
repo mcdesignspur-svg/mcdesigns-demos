@@ -300,6 +300,9 @@ Aerolínea Sur
             await addProgress('Structured data extracted', 400);
             await addProgress(`Routed to <strong>${data.routing?.rep_name || 'team'}</strong>`, 400);
             await addProgress(`Ticket <strong>${data.ticket_id}</strong> created in CRM`, 400);
+            if (data.classification?.aog_flag) {
+                await addProgress(`<span class="text-aog font-bold">WhatsApp + SMS alert sent to ${data.routing?.rep_name?.split(' ')[0] || 'on-call rep'} · on-call</span>`, 400);
+            }
             await addProgress('Acknowledgment sent to customer', 300);
 
             setTimeout(() => {
@@ -385,9 +388,24 @@ Aerolínea Sur
 
             <!-- Quote draft -->
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 class="font-bold text-lg mb-3">Quote Draft <span class="text-xs font-normal text-slate-500">(ready for rep to review/send)</span></h3>
+                <h3 class="font-bold text-lg mb-3">Quote Draft <span class="text-xs font-normal text-slate-500">(ready for ${d.routing?.rep_name?.split(' ')[0] || 'rep'} to review/send)</span></h3>
                 <div class="text-xs text-slate-500 mb-2"><strong>Subject:</strong> ${d.quote_draft?.subject || '-'}</div>
                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm whitespace-pre-wrap leading-relaxed">${d.quote_draft?.body || '-'}</div>
+                <div class="flex items-center gap-2 mt-4 pt-4 border-t border-slate-200">
+                    <button onclick="alert('In production: sends the email and marks the RFQ as quoted.')" class="flex items-center gap-1.5 px-4 py-2 bg-ok text-white text-xs font-bold uppercase tracking-widest rounded-lg hover:opacity-90 transition">
+                        <span class="material-symbols-outlined text-sm">send</span>
+                        Approve &amp; Send
+                    </button>
+                    <button onclick="alert('In production: opens the draft in the rep\\'s email client for tweaks.')" class="flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-slate-50 transition">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                        Edit
+                    </button>
+                    <button onclick="alert('In production: flags for manual handling, AI does not auto-send.')" class="flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-slate-50 transition">
+                        <span class="material-symbols-outlined text-sm">close</span>
+                        Reject
+                    </button>
+                    <span class="ml-auto text-[11px] text-slate-400 uppercase tracking-widest font-bold">Rep owns the send</span>
+                </div>
             </div>
 
             <!-- Internal notes -->
