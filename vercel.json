@@ -13,9 +13,6 @@
     { "source": "/aviation/email-parse", "destination": "/aviation/email-parse.html" },
     { "source": "/burbuja", "destination": "/burbuja/index.html" },
     { "source": "/burbuja/dashboard", "destination": "/burbuja/dashboard.html" },
-    { "source": "/agrocentro", "destination": "/agrocentro/index.html" },
-    { "source": "/agrocentro/checkout", "destination": "/agrocentro/checkout.html" },
-    { "source": "/agrocentro/dashboard", "destination": "/agrocentro/dashboard.html" },
     { "source": "/prototypes/westside", "destination": "/prototypes/westside/index.html" }
   ],
   "headers": [
