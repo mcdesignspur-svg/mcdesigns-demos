@@ -5,8 +5,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { CONTEXT_TOOLS, runTool, BRAND_VOICE } from './ws-tools.js';
 
-const SONNET = process.env.WESTSIDE_SONNET_MODEL || 'claude-sonnet-4-20250514';
-const HAIKU = process.env.WESTSIDE_HAIKU_MODEL || 'claude-3-5-haiku-20241022';
+const SONNET = process.env.WESTSIDE_SONNET_MODEL || 'claude-sonnet-4-6';
+const HAIKU = process.env.WESTSIDE_HAIKU_MODEL || 'claude-haiku-4-5-20251001';
 
 function client() { return new Anthropic(); }
 
