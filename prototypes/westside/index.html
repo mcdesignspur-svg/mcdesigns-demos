@@ -136,18 +136,17 @@
     <div class="max-w-7xl mx-auto px-6 py-14">
         <div class="inline-block text-[11px] font-mono uppercase tracking-[0.25em] text-brand mb-4">Pilar 2 · Content Studio</div>
         <h1 class="font-display text-5xl md:text-6xl tracking-tight leading-[0.95] max-w-3xl">
-            Cinco agents.<br/>
-            Un draft listo para publicar.
+            Tres etapas.<br/>
+            Un draft listo para review.
         </h1>
         <p class="mt-5 max-w-2xl text-inkMuted text-lg leading-relaxed">
-            El Content Studio de WestSide usa cinco agents especializados de Claude trabajando en equipo —
-            contexto, estrategia, copy, visual, QA — para generar contenido en voz WestSide,
-            calibrado por ubicación, con streaming en vivo para revisar cada paso del proceso.
+            Este prototipo usa una orquestación simple con Claude: primero entiende el contexto de la ubicación,
+            luego genera copy y dirección visual en voz WestSide, y al final pasa un QA de marca antes de mostrar el draft.
         </p>
 
         <div class="mt-8 flex flex-wrap gap-2 text-[11px] font-mono text-inkMuted">
             <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Claude agent orchestration</span>
-            <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Sonnet 4.6 · Haiku 4.5</span>
+            <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Claude Sonnet · Haiku</span>
             <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Spanglish PR calibrado</span>
             <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Streaming en vivo</span>
         </div>
@@ -192,7 +191,7 @@
 
             <button id="generate-btn"
                 class="mt-6 w-full bg-brand hover:bg-brandBright text-white font-semibold py-3.5 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span>Generar con 5 agents</span>
+                <span>Generar draft</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </button>
 
@@ -209,25 +208,13 @@
             </div>
 
             <div class="space-y-2" id="agents-list">
-                <!-- Agent rows -->
-                <div class="agent-row pending p-4 rounded-lg" data-agent="context">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <div class="font-semibold text-sm">ContextAgent</div>
-                            <div class="text-xs text-inkMuted mt-0.5">Pulla clases, promos, y posts recientes de la ubicación</div>
-                        </div>
-                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">haiku 4.5</div>
-                    </div>
-                    <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
-                </div>
-
                 <div class="agent-row pending p-4 rounded-lg" data-agent="strategist">
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="font-semibold text-sm">StrategistAgent</div>
-                            <div class="text-xs text-inkMuted mt-0.5">Decide ángulo narrativo, formato óptimo y hook pattern</div>
+                            <div class="font-semibold text-sm">Strategy Stage</div>
+                            <div class="text-xs text-inkMuted mt-0.5">Reúne contexto de ubicación y decide ángulo, formato y hook pattern</div>
                         </div>
-                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">sonnet 4.6</div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">claude</div>
                     </div>
                     <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
                 </div>
@@ -235,21 +222,10 @@
                 <div class="agent-row pending p-4 rounded-lg" data-agent="copy">
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="font-semibold text-sm">CopyAgent</div>
-                            <div class="text-xs text-inkMuted mt-0.5">Redacta hooks, captions y script en voz WestSide</div>
+                            <div class="font-semibold text-sm">Copy Stage</div>
+                            <div class="text-xs text-inkMuted mt-0.5">Redacta hooks, captions, script y dirección visual en voz WestSide</div>
                         </div>
-                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">sonnet 4.6</div>
-                    </div>
-                    <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
-                </div>
-
-                <div class="agent-row pending p-4 rounded-lg" data-agent="visual">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <div class="font-semibold text-sm">VisualAgent</div>
-                            <div class="text-xs text-inkMuted mt-0.5">Genera prompts de imagen y references para shoot</div>
-                        </div>
-                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">sonnet 4.6</div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">claude</div>
                     </div>
                     <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
                 </div>
@@ -257,10 +233,10 @@
                 <div class="agent-row pending p-4 rounded-lg" data-agent="qa">
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="font-semibold text-sm">QAAgent</div>
+                            <div class="font-semibold text-sm">QA Stage</div>
                             <div class="text-xs text-inkMuted mt-0.5">Valida length, compliance de marca y coherencia</div>
                         </div>
-                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">haiku 4.5</div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">claude</div>
                     </div>
                     <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
                 </div>
@@ -268,7 +244,7 @@
 
             <div class="mt-6 p-4 rounded-lg bg-brandSoft/50 border border-brand/20">
                 <div class="text-xs font-mono uppercase tracking-widest text-brand mb-1">Fase 1 · próximo</div>
-                <div class="text-sm text-ink">Migrar esta orquestación a Claude Managed Agents manteniendo el mismo flujo: contexto → estrategia → copy + visual → QA.</div>
+                <div class="text-sm text-ink">Migrar estas tres etapas a Claude Managed Agents: Strategy → Copy → QA, con memoria de marca y feedback persistente.</div>
             </div>
         </div>
     </div>
@@ -310,7 +286,7 @@
     const pickActive = (id) => document.querySelector(`#${id} .chip.active`)?.dataset.value;
 
     // ---------- agent row helpers ----------
-    const AGENTS = ['context', 'strategist', 'copy', 'visual', 'qa'];
+    const AGENTS = ['strategist', 'copy', 'qa'];
     function resetAgents() {
         AGENTS.forEach(a => {
             const row = document.querySelector(`[data-agent="${a}"]`);

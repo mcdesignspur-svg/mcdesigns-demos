@@ -60,15 +60,17 @@ export default async function handler(req, res) {
     try {
         sse(res, 'orchestrator.start', { input });
 
-        const context = await run('context', () => contextAgent({ location }));
-        const strategy = await run('strategist', () => strategistAgent({ context, input }));
+        const { context, strategy } = await run('strategist', async () => {
+            const context = await contextAgent({ location });
+            const strategy = await strategistAgent({ context, input });
+            return { context, strategy };
+        });
 
-        // CopyAgent and VisualAgent in parallel
-        sse(res, 'orchestrator.parallel', { agents: ['copy', 'visual'] });
-        const [copy, visual] = await Promise.all([
-            run('copy', () => copyAgent({ context, strategy, input })),
-            run('visual', () => visualAgent({ context, strategy, copy: null, input })),
-        ]);
+        const { copy, visual } = await run('copy', async () => {
+            const copy = await copyAgent({ context, strategy, input });
+            const visual = await visualAgent({ context, strategy, copy, input });
+            return { copy, visual };
+        });
 
         const qa = await run('qa', () => qaAgent({ copy, visual, strategy }));
 
@@ -115,13 +117,21 @@ function summarize(name, r) {
                 promos: (r.active_promos || []).length,
                 best_time: r.best_time || null,
             };
-        case 'strategist':
-            return { arc: r.narrative_arc, format: r.recommended_format, hook: r.hook_archetype };
+        case 'strategist': {
+            const context = r.context || {};
+            const strategy = r.strategy || r;
+            return {
+                classes: (context.classes_this_week || []).length,
+                promos: (context.active_promos || []).length,
+                format: strategy.recommended_format,
+                hook: strategy.hook_archetype,
+            };
+        }
         case 'copy':
             return {
-                hook_preview: r.hooks?.[0],
-                caption_len: r.caption_medium?.length,
-                hashtags: r.hashtags?.length,
+                hook_preview: r.copy?.hooks?.[0] || r.hooks?.[0],
+                caption_len: r.copy?.caption_medium?.length || r.caption_medium?.length,
+                visual: r.visual?.suggested_visual_beat ? 'ready' : '—',
             };
         case 'visual':
             return { prompt_preview: (r.image_prompt || '').slice(0, 80) + '…' };

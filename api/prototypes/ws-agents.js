@@ -1,6 +1,6 @@
-// Five specialized agents for WestSide Content Studio.
-// Each is a Claude call with its own system prompt, model, and (optionally) tools.
-// The orchestrator in westside-generate.js chains them and emits SSE events.
+// Claude helper calls for the WestSide Content Studio prototype.
+// The public prototype presents three stages: Strategy, Copy, and QA.
+// Context and visual generation run as internal substeps.
 
 import Anthropic from '@anthropic-ai/sdk';
 import { CONTEXT_TOOLS, runTool, BRAND_VOICE } from './ws-tools.js';
