@@ -41,6 +41,9 @@ export async function regenerateElement({ element, currentDraft, strategy, conte
 Brand voice KB:
 ${JSON.stringify(BRAND_VOICE, null, 2)}
 ${feedbackSystemBlock}
+## Guardia de profanity (REGLA DURA)
+NUNCA uses ninguna palabra de \`vocabulary_prohibited\` — son slang PR soez inapropiado para un negocio familiar. Regla absoluta.
+
 Genera SOLO el elemento "${element}" — mantén coherencia con el resto del draft existente.${nudgeLine}
 
 Output SOLO JSON válido según el elemento:
@@ -167,6 +170,9 @@ export async function copyAgent({ context, strategy, input, feedback = [] }) {
 Brand voice KB:
 ${JSON.stringify(BRAND_VOICE, null, 2)}
 ${feedbackSystemBlock}
+## Guardia de profanity (REGLA DURA)
+NUNCA uses ninguna palabra de \`vocabulary_prohibited\` — son slang PR soez inapropiado para un negocio familiar. Esta regla es absoluta, no la suavices ni por contexto creativo.
+
 Debes aplicar el arco narrativo Problema→Proceso→Transformación que te pasa el Strategist. Nunca listas de features. Viewer es el protagonista, WestSide la guía.
 
 Salida SOLO JSON válido, sin markdown:
@@ -237,6 +243,7 @@ ${isReel ? fullSchema : minimalSchema}`;
 // QAAgent — validates + either PASS or FAIL with fixes
 // --------------------------------------------------------------------
 export async function qaAgent({ copy, visual, strategy }) {
+    const prohibitedList = (BRAND_VOICE.vocabulary_prohibited || []).join(', ');
     const system = `Eres QAAgent. Validas contenido antes de mostrarlo al cliente. Chequeos:
 1. caption_short <=280 chars
 2. caption_medium <=600 chars
@@ -246,13 +253,14 @@ export async function qaAgent({ copy, visual, strategy }) {
 6. Arco narrativo Problema→Proceso→Transformación presente en caption_medium
 7. Voz WestSide auténtica (spanglish PR, no corporate, no "team/family")
 8. Sin promesas médicas o claims prohibidos
+9. Profanity guard: contenido NO contiene ninguna de estas palabras (case-insensitive, ni siquiera embedded en otras palabras): ${prohibitedList}. Si detectas alguna → FAIL obligatorio.
 
 Salida SOLO JSON:
 {
   "status": "pass" | "fail",
   "checks": [
     { "name": "caption_short_length", "pass": true|false, "note": "..." },
-    ...todos los 8 checks
+    ...todos los 9 checks
   ],
   "blocker_notes": "Si fail, qué específicamente está mal. Si pass, null."
 }`;

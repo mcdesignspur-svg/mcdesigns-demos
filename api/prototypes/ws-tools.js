@@ -132,6 +132,7 @@ export const BRAND_VOICE = {
     tone: 'Spanglish PR natural, warm pero directo. Motivador sin ser cursi.',
     vocabulary_yes: ['brutal', 'súper', 'chévere', 'pa\'lante', 'échale', 'fuego', 'enfocao', 'reps', 'gainz', 'sets', 'cardio', 'leg day'],
     vocabulary_no: ['team', 'nuestra familia fit', 'corporate wellness', 'elite athlete community'],
+    vocabulary_prohibited: ['bellaco', 'bellaca', 'coño', 'cono', 'carajo', 'joder', 'jodido', 'jodida', 'cabrón', 'cabrona', 'puñeta', 'mierda'],
     arc: 'Problema → Proceso → Transformación. Viewer es el protagonista, WestSide la guía.',
     emoji_policy: 'máx 2-3 por caption, nunca overused',
     hashtags_required: ['#westsidefitness'],
