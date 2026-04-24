@@ -29,3 +29,37 @@ export async function logDemo(demoType, inputData, result, metadata = {}) {
     console.error('[supabase] log error:', err?.message);
   }
 }
+
+export async function saveWsDraft(row) {
+  const client = getClient();
+  if (!client) return null;
+  try {
+    const { data, error } = await client
+      .from('proto_ws_drafts')
+      .insert(row)
+      .select('id')
+      .single();
+    if (error) throw error;
+    return data?.id || null;
+  } catch (err) {
+    console.error('[supabase] saveWsDraft error:', err?.message);
+    return null;
+  }
+}
+
+export async function listWsDrafts(limit = 30) {
+  const client = getClient();
+  if (!client) return [];
+  try {
+    const { data, error } = await client
+      .from('proto_ws_drafts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return data || [];
+  } catch (err) {
+    console.error('[supabase] listWsDrafts error:', err?.message);
+    return [];
+  }
+}

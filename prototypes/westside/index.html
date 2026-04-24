@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Content Studio · WestSide × MC Designs</title>
+    <meta name="robots" content="noindex, nofollow"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Anton&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: "#0056C6",
+                        brandBright: "#006DF8",
+                        brandSoft: "#D9E2FF",
+                        terracotta: "#9E4227",
+                        terracottaSoft: "#FBEBE4",
+                        surface: "#F9F9F9",
+                        surfaceLow: "#F3F3F3",
+                        surfaceHigh: "#E8E8E8",
+                        ink: "#1A1C1C",
+                        inkMuted: "#424655",
+                        outline: "#C2C6D8",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Anton", "Impact", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #F9F9F9; color: #1A1C1C; }
+        .hero-gradient {
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0,109,248,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 95% 10%, rgba(158,66,39,0.10) 0%, transparent 55%),
+                linear-gradient(180deg, #FFFFFF 0%, #F9F9F9 100%);
+        }
+        .pulse-pip::before {
+            content: '';
+            display: inline-block;
+            width: 7px; height: 7px;
+            background: #0056C6;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+            animation: pip 2s ease-in-out infinite;
+        }
+        @keyframes pip {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,86,198,0.4); }
+            50% { opacity: 0.6; box-shadow: 0 0 0 8px rgba(0,86,198,0); }
+        }
+        .card {
+            background: #FFFFFF;
+            border: 1px solid rgba(26,28,28,0.08);
+            border-radius: 16px;
+        }
+        .chip {
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid #C2C6D8;
+        }
+        .chip:hover { border-color: #0056C6; color: #0056C6; }
+        .chip.active {
+            background: #0056C6;
+            color: white;
+            border-color: #0056C6;
+        }
+        .agent-row {
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        .agent-row.pending { opacity: 0.4; }
+        .agent-row.running {
+            border-left-color: #006DF8;
+            background: rgba(217,226,255,0.35);
+        }
+        .agent-row.done {
+            border-left-color: #22C55E;
+            opacity: 0.8;
+        }
+        .agent-row.failed {
+            border-left-color: #EF4444;
+            background: rgba(239,68,68,0.05);
+        }
+        .spinner {
+            width: 14px; height: 14px;
+            border: 2px solid #D9E2FF;
+            border-top-color: #0056C6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .check {
+            width: 14px; height: 14px;
+            color: #22C55E;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+<!-- Demo Banner -->
+<div class="bg-terracotta text-white text-[11px] font-semibold uppercase tracking-[0.2em] py-2 text-center">
+    Demo privado · MC Designs × WestSide Fitness · No compartir
+</div>
+
+<!-- Top bar -->
+<header class="border-b border-outline/40 bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-brand flex items-center justify-center text-white font-display text-lg tracking-wide">MC</div>
+            <div>
+                <div class="font-display text-xl tracking-wide leading-none">CONTENT STUDIO</div>
+                <div class="text-[11px] font-mono text-inkMuted mt-0.5">prototype · westside fitness</div>
+            </div>
+        </div>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+            <a href="/prototypes/westside" class="text-brand font-semibold">Generator</a>
+            <a href="/prototypes/westside/calendar" class="text-inkMuted hover:text-ink">Calendar</a>
+            <a href="/prototypes/westside/agents" class="text-inkMuted hover:text-ink">Agents</a>
+        </nav>
+        <div class="text-[11px] font-mono text-inkMuted">
+            <span class="pulse-pip">v0.1 · fase 0</span>
+        </div>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero-gradient border-b border-outline/30">
+    <div class="max-w-7xl mx-auto px-6 py-14">
+        <div class="inline-block text-[11px] font-mono uppercase tracking-[0.25em] text-brand mb-4">Pilar 2 · Content Studio</div>
+        <h1 class="font-display text-5xl md:text-6xl tracking-tight leading-[0.95] max-w-3xl">
+            Cinco agents.<br/>
+            Un draft listo para publicar.
+        </h1>
+        <p class="mt-5 max-w-2xl text-inkMuted text-lg leading-relaxed">
+            El Content Studio de WestSide usa cinco agents especializados de Claude trabajando en equipo —
+            contexto, estrategia, copy, visual, QA — para generar contenido en voz WestSide,
+            calibrado por ubicación, listo para review en &lt;30 segundos.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-2 text-[11px] font-mono text-inkMuted">
+            <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Anthropic Managed Agents</span>
+            <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Sonnet 4.6 · Haiku 4.5</span>
+            <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Spanglish PR calibrado</span>
+            <span class="px-3 py-1.5 rounded-full bg-white border border-outline">Streaming en vivo</span>
+        </div>
+    </div>
+</section>
+
+<!-- Generator -->
+<section class="max-w-7xl mx-auto px-6 py-12">
+    <div class="grid lg:grid-cols-[1fr_1.2fr] gap-6">
+
+        <!-- Input column -->
+        <div class="card p-7">
+            <div class="text-[11px] font-mono uppercase tracking-[0.25em] text-inkMuted mb-5">01 · Input</div>
+
+            <label class="block text-sm font-semibold mb-2">Ubicación</label>
+            <div class="flex flex-wrap gap-2 mb-6" id="location-chips">
+                <div class="chip active px-4 py-2 rounded-full text-sm" data-value="Caguas">Caguas</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="San Juan">San Juan</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="Bayamón">Bayamón</div>
+            </div>
+
+            <label class="block text-sm font-semibold mb-2">Tipo de post</label>
+            <div class="flex flex-wrap gap-2 mb-6" id="type-chips">
+                <div class="chip active px-4 py-2 rounded-full text-sm" data-value="Motivación">Motivación</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="Promo">Promo</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="Testimonio">Testimonio</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="Tip">Tip</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="Evento">Evento</div>
+            </div>
+
+            <label class="block text-sm font-semibold mb-2">Formato</label>
+            <div class="flex flex-wrap gap-2 mb-6" id="format-chips">
+                <div class="chip active px-4 py-2 rounded-full text-sm" data-value="Reel">Reel</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="Carrusel">Carrusel</div>
+                <div class="chip px-4 py-2 rounded-full text-sm" data-value="Static">Static</div>
+            </div>
+
+            <label class="block text-sm font-semibold mb-2">Tema / ángulo</label>
+            <textarea id="topic" rows="3"
+                class="w-full rounded-xl border border-outline bg-surface px-4 py-3 text-sm placeholder:text-inkMuted/60 focus:border-brand focus:ring-2 focus:ring-brand/20 transition"
+                placeholder="Ej: cómo romper la barrera del lunes · leg day sin miedo · free trial de 7 días"></textarea>
+
+            <button id="generate-btn"
+                class="mt-6 w-full bg-brand hover:bg-brandBright text-white font-semibold py-3.5 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <span>Generar con 5 agents</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </button>
+
+            <p class="mt-3 text-[11px] font-mono text-inkMuted text-center">
+                fase 0 · scaffold listo · backend en fase 1
+            </p>
+        </div>
+
+        <!-- Agents column -->
+        <div class="card p-7">
+            <div class="flex items-center justify-between mb-5">
+                <div class="text-[11px] font-mono uppercase tracking-[0.25em] text-inkMuted">02 · Agent pipeline</div>
+                <div class="text-[11px] font-mono text-inkMuted" id="pipeline-status">idle</div>
+            </div>
+
+            <div class="space-y-2" id="agents-list">
+                <!-- Agent rows -->
+                <div class="agent-row pending p-4 rounded-lg" data-agent="context">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold text-sm">ContextAgent</div>
+                            <div class="text-xs text-inkMuted mt-0.5">Pulla clases, promos, y posts recientes de la ubicación</div>
+                        </div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">haiku 4.5</div>
+                    </div>
+                    <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
+                </div>
+
+                <div class="agent-row pending p-4 rounded-lg" data-agent="strategist">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold text-sm">StrategistAgent</div>
+                            <div class="text-xs text-inkMuted mt-0.5">Decide ángulo narrativo, formato óptimo y hook pattern</div>
+                        </div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">sonnet 4.6</div>
+                    </div>
+                    <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
+                </div>
+
+                <div class="agent-row pending p-4 rounded-lg" data-agent="copy">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold text-sm">CopyAgent</div>
+                            <div class="text-xs text-inkMuted mt-0.5">Redacta hooks, captions y script en voz WestSide</div>
+                        </div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">sonnet 4.6</div>
+                    </div>
+                    <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
+                </div>
+
+                <div class="agent-row pending p-4 rounded-lg" data-agent="visual">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold text-sm">VisualAgent</div>
+                            <div class="text-xs text-inkMuted mt-0.5">Genera prompts de imagen y references para shoot</div>
+                        </div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">sonnet 4.6</div>
+                    </div>
+                    <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
+                </div>
+
+                <div class="agent-row pending p-4 rounded-lg" data-agent="qa">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold text-sm">QAAgent</div>
+                            <div class="text-xs text-inkMuted mt-0.5">Valida length, compliance de marca y coherencia</div>
+                        </div>
+                        <div class="text-[10px] font-mono px-2 py-1 rounded bg-surfaceLow text-inkMuted">haiku 4.5</div>
+                    </div>
+                    <div class="agent-status mt-3 text-[11px] font-mono text-inkMuted hidden"></div>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 rounded-lg bg-brandSoft/50 border border-brand/20">
+                <div class="text-xs font-mono uppercase tracking-widest text-brand mb-1">Fase 1 · próximo</div>
+                <div class="text-sm text-ink">Conectar backend con Claude Agent SDK y streaming SSE en vivo. Los agents se encenderán secuencial + paralelo según el orquestador.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Output -->
+    <div class="card mt-6 p-7" id="output-card">
+        <div class="flex items-center justify-between mb-5">
+            <div class="text-[11px] font-mono uppercase tracking-[0.25em] text-inkMuted">03 · Draft output</div>
+            <div class="text-[11px] font-mono text-inkMuted" id="output-meta"></div>
+        </div>
+        <div id="output-empty" class="py-16 text-center">
+            <div class="font-mono text-xs text-inkMuted uppercase tracking-widest">esperando primer run</div>
+            <div class="mt-3 text-sm text-inkMuted max-w-md mx-auto">
+                Aquí aparecerán hooks A/B, captions, script de Reel, keyword ManyChat, hashtags, visual prompt, y resultado QA.
+            </div>
+        </div>
+        <div id="output-content" class="hidden space-y-6"></div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-outline/40 bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between text-[11px] font-mono text-inkMuted">
+        <div>MC Designs · prototypes/westside</div>
+        <div>build log · <a href="/prototypes/westside/agents" class="text-brand hover:underline">ver agents en vivo →</a></div>
+    </div>
+</footer>
+
+<script>
+    // ---------- chip select ----------
+    document.querySelectorAll('[id$="-chips"]').forEach(group => {
+        group.addEventListener('click', (e) => {
+            const chip = e.target.closest('.chip');
+            if (!chip) return;
+            group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+        });
+    });
+    const pickActive = (id) => document.querySelector(`#${id} .chip.active`)?.dataset.value;
+
+    // ---------- agent row helpers ----------
+    const AGENTS = ['context', 'strategist', 'copy', 'visual', 'qa'];
+    function resetAgents() {
+        AGENTS.forEach(a => {
+            const row = document.querySelector(`[data-agent="${a}"]`);
+            row.classList.remove('running', 'done', 'failed');
+            row.classList.add('pending');
+            const s = row.querySelector('.agent-status');
+            s.classList.add('hidden');
+            s.innerHTML = '';
+        });
+    }
+    function setAgentState(name, state, text) {
+        const row = document.querySelector(`[data-agent="${name}"]`);
+        if (!row) return;
+        row.classList.remove('pending', 'running', 'done', 'failed');
+        row.classList.add(state);
+        const s = row.querySelector('.agent-status');
+        if (text) {
+            s.classList.remove('hidden');
+            s.innerHTML = text;
+        }
+    }
+
+    // ---------- output render ----------
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    function renderOutput(payload) {
+        const { run_ms, output, draft_id } = payload;
+        const empty = document.getElementById('output-empty');
+        const content = document.getElementById('output-content');
+        const meta = document.getElementById('output-meta');
+        empty.classList.add('hidden');
+        content.classList.remove('hidden');
+
+        meta.innerHTML = `run ${(run_ms / 1000).toFixed(1)}s · draft <span class="text-brand">${draft_id ? draft_id.slice(0, 8) : 'local'}</span> · qa <span class="${output.qa?.status === 'pass' ? 'text-green-600' : 'text-amber-600'}">${output.qa?.status || '—'}</span>`;
+
+        const hooks = (output.hooks || []).map((h, i) => `
+            <div class="flex items-start gap-3 p-3 rounded-lg bg-surfaceLow">
+                <div class="text-[10px] font-mono text-inkMuted mt-1">V${i + 1}</div>
+                <div class="flex-1 text-sm">${esc(h)}</div>
+                <button class="copy-btn text-[10px] font-mono text-inkMuted hover:text-brand" data-copy="${esc(h)}">copiar</button>
+            </div>
+        `).join('');
+
+        const beats = output.reel_script ? Object.entries(output.reel_script).map(([k, v]) => `
+            <div class="p-3 rounded-lg bg-surfaceLow">
+                <div class="text-[10px] font-mono uppercase tracking-widest text-brand mb-1">${k}</div>
+                <div class="text-sm"><strong>VO:</strong> ${esc(v.voiceover)}</div>
+                <div class="text-sm text-inkMuted"><strong>VISUAL:</strong> ${esc(v.visual)}</div>
+            </div>
+        `).join('') : '';
+
+        const checks = (output.qa?.checks || []).map(c => `
+            <li class="flex items-start gap-2">
+                <span class="${c.pass ? 'text-green-600' : 'text-red-600'} font-mono text-xs mt-0.5">${c.pass ? '✓' : '✗'}</span>
+                <span class="text-xs"><strong>${esc(c.name)}:</strong> ${esc(c.note)}</span>
+            </li>
+        `).join('');
+
+        content.innerHTML = `
+            <!-- Hooks -->
+            <div>
+                <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Hooks · 3 variantes A/B</div>
+                <div class="space-y-2">${hooks}</div>
+            </div>
+
+            <!-- Captions -->
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Caption corta · ${output.caption_short?.length || 0}/280</div>
+                    <div class="p-4 rounded-lg bg-surfaceLow text-sm whitespace-pre-wrap">${esc(output.caption_short)}</div>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Caption media · ${output.caption_medium?.length || 0}/600</div>
+                    <div class="p-4 rounded-lg bg-surfaceLow text-sm whitespace-pre-wrap">${esc(output.caption_medium)}</div>
+                </div>
+            </div>
+
+            <!-- Reel Script -->
+            <div>
+                <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Reel script · 15s</div>
+                <div class="space-y-2">${beats}</div>
+            </div>
+
+            <!-- ManyChat + Hashtags + Best time -->
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">ManyChat</div>
+                    <div class="p-4 rounded-lg bg-brandSoft/50">
+                        <div class="font-display text-2xl tracking-wide">${esc(output.manychat?.keyword)}</div>
+                        <div class="text-xs text-inkMuted mt-1">${esc(output.manychat?.trigger_line)}</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Hashtags</div>
+                    <div class="p-4 rounded-lg bg-surfaceLow text-xs font-mono break-words">${esc((output.hashtags || []).join(' '))}</div>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Best time</div>
+                    <div class="p-4 rounded-lg bg-surfaceLow text-sm">${esc(output.best_time || '—')}</div>
+                </div>
+            </div>
+
+            <!-- Visual -->
+            <div>
+                <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Visual prompt</div>
+                <div class="p-4 rounded-lg bg-surfaceLow text-sm">${esc(output.image_prompt)}</div>
+                ${output.shoot_references ? `
+                <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mt-4 mb-2">Shoot references</div>
+                <ul class="space-y-1 text-sm text-inkMuted list-disc pl-5">
+                    ${output.shoot_references.map(r => `<li>${esc(r)}</li>`).join('')}
+                </ul>` : ''}
+            </div>
+
+            <!-- QA -->
+            <div>
+                <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">QA checks</div>
+                <ul class="space-y-1 p-4 rounded-lg bg-surfaceLow">${checks}</ul>
+                ${output.qa?.blocker_notes ? `<div class="mt-2 text-xs text-red-600">${esc(output.qa.blocker_notes)}</div>` : ''}
+            </div>
+        `;
+
+        // Copy buttons
+        content.querySelectorAll('[data-copy]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                navigator.clipboard?.writeText(btn.dataset.copy);
+                btn.textContent = 'copiado ✓';
+                setTimeout(() => btn.textContent = 'copiar', 1500);
+            });
+        });
+    }
+
+    // ---------- generate (SSE) ----------
+    const btn = document.getElementById('generate-btn');
+    const statusEl = document.getElementById('pipeline-status');
+
+    btn.addEventListener('click', () => {
+        const payload = {
+            location: pickActive('location-chips'),
+            post_type: pickActive('type-chips'),
+            format: pickActive('format-chips'),
+            topic: document.getElementById('topic').value.trim(),
+        };
+        if (!payload.topic || payload.topic.length < 3) {
+            alert('Escribe un tema / ángulo antes de generar.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'Orquestando…';
+        resetAgents();
+        document.getElementById('output-empty').classList.remove('hidden');
+        document.getElementById('output-content').classList.add('hidden');
+        document.getElementById('output-meta').textContent = '';
+        statusEl.textContent = 'running…';
+
+        const qs = new URLSearchParams(payload).toString();
+        const es = new EventSource(`/api/prototypes/westside-generate?${qs}`);
+
+        es.addEventListener('orchestrator.start', () => { statusEl.textContent = 'starting…'; });
+        es.addEventListener('orchestrator.parallel', (e) => {
+            const d = JSON.parse(e.data);
+            statusEl.textContent = `parallel: ${d.agents.join(' + ')}`;
+        });
+        es.addEventListener('agent.start', (e) => {
+            const { agent } = JSON.parse(e.data);
+            setAgentState(agent, 'running', '<div class="flex items-center gap-2"><div class="spinner"></div> <span>running…</span></div>');
+            statusEl.textContent = `${agent} running…`;
+        });
+        es.addEventListener('agent.done', (e) => {
+            const { agent, ms, preview } = JSON.parse(e.data);
+            const prev = Object.entries(preview).map(([k, v]) => `<span class="text-inkMuted">${k}=</span><span class="text-ink">${String(v)}</span>`).join(' · ');
+            setAgentState(agent, 'done', `<div>✓ ${ms}ms · ${prev}</div>`);
+        });
+        es.addEventListener('agent.failed', (e) => {
+            const { agent, error } = JSON.parse(e.data);
+            setAgentState(agent, 'failed', `<div class="text-red-600">✗ ${error}</div>`);
+        });
+        es.addEventListener('orchestrator.done', (e) => {
+            const data = JSON.parse(e.data);
+            statusEl.textContent = `done · ${(data.run_ms / 1000).toFixed(1)}s`;
+            renderOutput(data);
+            es.close();
+            btn.disabled = false;
+            btn.querySelector('span').textContent = 'Generar otra';
+        });
+        es.addEventListener('orchestrator.failed', (e) => {
+            const { error } = JSON.parse(e.data);
+            statusEl.textContent = `failed`;
+            alert('Error: ' + error);
+            es.close();
+            btn.disabled = false;
+            btn.querySelector('span').textContent = 'Reintentar';
+        });
+        es.onerror = () => {
+            statusEl.textContent = 'connection error';
+            es.close();
+            btn.disabled = false;
+            btn.querySelector('span').textContent = 'Reintentar';
+        };
+    });
+</script>
+
+</body>
+</html>
