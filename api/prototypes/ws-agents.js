@@ -150,7 +150,18 @@ export async function strategistAgent({ context, input, feedback = [] }) {
 // CopyAgent — hooks + captions + reel script in WestSide voice
 // --------------------------------------------------------------------
 export async function copyAgent({ context, strategy, input, feedback = [] }) {
+    const isReel = input?.format === 'Reel';
     const feedbackSystemBlock = formatFeedbackSystemBlock(feedback);
+
+    const reelSchema = `  "reel_script": {
+    "hook": { "voiceover": "...", "visual": "..." },
+    "beat_1": { "voiceover": "...", "visual": "..." },
+    "beat_2": { "voiceover": "...", "visual": "..." },
+    "beat_3": { "voiceover": "...", "visual": "..." },
+    "cta": { "voiceover": "...", "visual": "..." }
+  },
+`;
+
     const system = `Eres CopyAgent. Redactas en voz WestSide Fitness Club — spanglish PR auténtico, warm, directo.
 
 Brand voice KB:
@@ -163,22 +174,15 @@ Salida SOLO JSON válido, sin markdown:
   "hooks": ["v1 <=10 palabras", "v2 <=10 palabras", "v3 <=10 palabras"],
   "caption_short": "<=280 chars con CTA ManyChat",
   "caption_medium": "<=600 chars con arco completo + CTA ManyChat",
-  "reel_script": {
-    "hook": { "voiceover": "...", "visual": "..." },
-    "beat_1": { "voiceover": "...", "visual": "..." },
-    "beat_2": { "voiceover": "...", "visual": "..." },
-    "beat_3": { "voiceover": "...", "visual": "..." },
-    "cta": { "voiceover": "...", "visual": "..." }
-  },
-  "manychat": { "keyword": "UNA_PALABRA", "trigger_line": "línea exacta en caption" },
+${isReel ? reelSchema : ''}  "manychat": { "keyword": "UNA_PALABRA", "trigger_line": "línea exacta en caption" },
   "hashtags": ["<=12 hashtags, incluye #westsidefitness + hashtag de ubicación"]
-}`;
+}${isReel ? '' : '\n\nFormato: ' + input.format + '. NO generes reel_script — no aplica.'}`;
 
     const user = `Contexto operacional:\n${JSON.stringify(context, null, 2)}\n\nEstrategia:\n${JSON.stringify(strategy, null, 2)}\n\nInput:\n${JSON.stringify(input, null, 2)}\n\nEscribe todo el copy.`;
 
     const resp = await client().messages.create({
         model: SONNET,
-        max_tokens: 2500,
+        max_tokens: isReel ? 2500 : 1600,
         system,
         messages: [{ role: 'user', content: user }],
     });
@@ -191,13 +195,10 @@ Salida SOLO JSON válido, sin markdown:
 // --------------------------------------------------------------------
 // VisualAgent — image prompt + shoot references
 // --------------------------------------------------------------------
-export async function visualAgent({ context, strategy, copy, input }) {
-    const system = `Eres VisualAgent. Generas (a) un prompt detallado de imagen listo para Nano Banana/MidJourney, y (b) 3 shoot references para el equipo de WestSide si prefieren foto real.
+export async function visualAgent({ context, strategy, input }) {
+    const isReel = input?.format === 'Reel';
 
-Considera: branding WestSide (rojo/amarillo OK), ubicación específica, mood del copy, formato (${input.format}).
-
-Salida SOLO JSON válido:
-{
+    const fullSchema = `{
   "image_prompt": "Prompt completo en inglés, describiendo escena + ángulo + lighting + mood + branding cues. ~60 palabras.",
   "shoot_references": [
     "Referencia 1 para shoot en persona (1 oración actionable)",
@@ -207,11 +208,22 @@ Salida SOLO JSON válido:
   "suggested_visual_beat": "qué visual es el money-shot del post"
 }`;
 
-    const user = `Copy:\n${JSON.stringify(copy, null, 2)}\n\nEstrategia:\n${JSON.stringify(strategy, null, 2)}\n\nUbicación: ${input.location}. Tipo: ${input.post_type}. Formato: ${input.format}.`;
+    const minimalSchema = `{
+  "image_prompt": "Prompt breve en inglés (~40 palabras) describiendo escena + mood + branding cues (rojo/amarillo WestSide OK)."
+}`;
+
+    const system = `Eres VisualAgent. ${isReel
+        ? 'Generas prompt detallado de imagen + 3 shoot references para el equipo WestSide.'
+        : 'Generas un prompt de imagen breve y accionable.'} Considera branding WestSide, ubicación, formato (${input.format}).
+
+Salida SOLO JSON válido:
+${isReel ? fullSchema : minimalSchema}`;
+
+    const user = `Estrategia:\n${JSON.stringify(strategy, null, 2)}\n\nUbicación: ${input.location}. Tipo: ${input.post_type}. Formato: ${input.format}.`;
 
     const resp = await client().messages.create({
-        model: SONNET,
-        max_tokens: 1000,
+        model: isReel ? SONNET : HAIKU,
+        max_tokens: isReel ? 1000 : 400,
         system,
         messages: [{ role: 'user', content: user }],
     });

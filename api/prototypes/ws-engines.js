@@ -24,8 +24,10 @@ const directClaudeEngine = {
         });
 
         const { copy, visual } = await run('copy', async () => {
-            const copy = await copyAgent({ context, strategy, input, feedback });
-            const visual = await visualAgent({ context, strategy, copy, input });
+            const [copy, visual] = await Promise.all([
+                copyAgent({ context, strategy, input, feedback }),
+                visualAgent({ context, strategy, input }),
+            ]);
             return { copy, visual };
         });
 

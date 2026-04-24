@@ -522,11 +522,12 @@
                 </div>
             </div>
 
+            ${output.reel_script ? `
             <!-- Reel Script -->
             <div>
                 <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Reel script · 15s</div>
                 <div class="space-y-2">${beats}</div>
-            </div>
+            </div>` : ''}
 
             <!-- ManyChat + Hashtags + Best time -->
             <div class="grid md:grid-cols-3 gap-4">
