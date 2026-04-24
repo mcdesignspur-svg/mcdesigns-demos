@@ -130,7 +130,7 @@ export function runTool(name, input) {
 export const BRAND_VOICE = {
     identity: 'WestSide Fitness Club · única cadena 100% puertorriqueña · 3 locations (Caguas, San Juan, Bayamón) · 20 años operando PR',
     tone: 'Spanglish PR natural, warm pero directo. Motivador sin ser cursi.',
-    vocabulary_yes: ['brutal', 'súper', 'chévere', 'bellaco', 'pa\'lante', 'échale', 'fuego', 'enfocao', 'reps', 'gainz', 'sets', 'cardio', 'leg day'],
+    vocabulary_yes: ['brutal', 'súper', 'chévere', 'pa\'lante', 'échale', 'fuego', 'enfocao', 'reps', 'gainz', 'sets', 'cardio', 'leg day'],
     vocabulary_no: ['team', 'nuestra familia fit', 'corporate wellness', 'elite athlete community'],
     arc: 'Problema → Proceso → Transformación. Viewer es el protagonista, WestSide la guía.',
     emoji_policy: 'máx 2-3 por caption, nunca overused',
