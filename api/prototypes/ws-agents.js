@@ -11,6 +11,71 @@ const HAIKU = process.env.WESTSIDE_HAIKU_MODEL || 'claude-3-5-haiku-20241022';
 function client() { return new Anthropic(); }
 
 // --------------------------------------------------------------------
+// Feedback formatters — shared by Strategist + Copy
+// --------------------------------------------------------------------
+function formatFeedbackBlock(feedback) {
+    if (!feedback || feedback.length === 0) return '';
+    const rules = feedback.map((f, i) => `  ${i + 1}. ${f.rule}${f.notes ? ` — ${f.notes}` : ''}`).join('\n');
+    return `\nCalibración acumulada (aplicar SIEMPRE, orden = más reciente primero):\n${rules}\n`;
+}
+
+function formatFeedbackSystemBlock(feedback) {
+    if (!feedback || feedback.length === 0) return '';
+    const rules = feedback.map((f, i) => `${i + 1}. ${f.rule}${f.notes ? ` (${f.notes})` : ''}`).join('\n');
+    return `\n## Calibración acumulada (overrides obligatorios, más reciente primero)\n${rules}\nAplica TODAS estas reglas. Si hay conflicto con el Brand voice KB, gana la calibración más reciente.\n`;
+}
+
+// --------------------------------------------------------------------
+// Regenerate element — ephemeral sub-run for "Regenerar hooks" / "Regenerar caption"
+// --------------------------------------------------------------------
+export async function regenerateElement({ element, currentDraft, strategy, context, input, feedback = [], nudge = '' }) {
+    if (!['hooks', 'caption', 'hashtags'].includes(element)) {
+        throw new Error(`Invalid element: ${element}`);
+    }
+
+    const feedbackSystemBlock = formatFeedbackSystemBlock(feedback);
+    const nudgeLine = nudge ? `\nNudge específico para esta regeneración: ${nudge}` : '';
+
+    const system = `Eres CopyAgent regenerando un elemento específico del draft. Voz WestSide (spanglish PR, warm, directo).
+
+Brand voice KB:
+${JSON.stringify(BRAND_VOICE, null, 2)}
+${feedbackSystemBlock}
+Genera SOLO el elemento "${element}" — mantén coherencia con el resto del draft existente.${nudgeLine}
+
+Output SOLO JSON válido según el elemento:
+${element === 'hooks' ? '{ "hooks": ["v1 ≤10 palabras", "v2 ≤10 palabras", "v3 ≤10 palabras"] }' : ''}${element === 'caption' ? '{ "caption_short": "≤280 chars con CTA ManyChat", "caption_medium": "≤600 chars con arco completo + CTA ManyChat" }' : ''}${element === 'hashtags' ? '{ "hashtags": ["≤12 items, incluye #westsidefitness + hashtag de ubicación"] }' : ''}`;
+
+    const user = `Draft actual (NO lo regeneres completo, solo el elemento pedido):
+${JSON.stringify({
+    hooks: currentDraft.hooks,
+    caption_short: currentDraft.caption_short,
+    caption_medium: currentDraft.caption_medium,
+    hashtags: currentDraft.hashtags,
+    manychat: currentDraft.manychat,
+}, null, 2)}
+
+Estrategia original:
+${JSON.stringify(strategy, null, 2)}
+
+Input:
+${JSON.stringify(input, null, 2)}
+
+Regenera SOLO "${element}".`;
+
+    const resp = await client().messages.create({
+        model: SONNET,
+        max_tokens: 1200,
+        system,
+        messages: [{ role: 'user', content: user }],
+    });
+    const text = resp.content[0].text;
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error(`regenerateElement(${element}): no JSON`);
+    return JSON.parse(match[0]);
+}
+
+// --------------------------------------------------------------------
 // ContextAgent — pulls fresh data via tool_use loop
 // --------------------------------------------------------------------
 export async function contextAgent({ location }) {
@@ -55,7 +120,7 @@ export async function contextAgent({ location }) {
 // --------------------------------------------------------------------
 // StrategistAgent — decides angle, format, hook archetype
 // --------------------------------------------------------------------
-export async function strategistAgent({ context, input }) {
+export async function strategistAgent({ context, input, feedback = [] }) {
     const system = `Eres StrategistAgent. Dado el contexto operacional y la intención del post, decides la estrategia creativa. Salida SOLO JSON válido, sin markdown:
 {
   "narrative_arc": "Problema → Proceso → Transformación explícito (1 oración por paso)",
@@ -66,7 +131,8 @@ export async function strategistAgent({ context, input }) {
   "manychat_goal": "qué lead-gen objetivo (si aplica, ej: free-trial signup | guía PDF | info clase)"
 }`;
 
-    const user = `Contexto:\n${JSON.stringify(context, null, 2)}\n\nInput:\n- Ubicación: ${input.location}\n- Tipo: ${input.post_type}\n- Formato solicitado: ${input.format}\n- Tema: ${input.topic}\n\nDecide la estrategia.`;
+    const feedbackBlock = formatFeedbackBlock(feedback);
+    const user = `Contexto:\n${JSON.stringify(context, null, 2)}\n\nInput:\n- Ubicación: ${input.location}\n- Tipo: ${input.post_type}\n- Formato solicitado: ${input.format}\n- Tema: ${input.topic}\n${feedbackBlock}\nDecide la estrategia.`;
 
     const resp = await client().messages.create({
         model: SONNET,
@@ -83,12 +149,13 @@ export async function strategistAgent({ context, input }) {
 // --------------------------------------------------------------------
 // CopyAgent — hooks + captions + reel script in WestSide voice
 // --------------------------------------------------------------------
-export async function copyAgent({ context, strategy, input }) {
+export async function copyAgent({ context, strategy, input, feedback = [] }) {
+    const feedbackSystemBlock = formatFeedbackSystemBlock(feedback);
     const system = `Eres CopyAgent. Redactas en voz WestSide Fitness Club — spanglish PR auténtico, warm, directo.
 
 Brand voice KB:
 ${JSON.stringify(BRAND_VOICE, null, 2)}
-
+${feedbackSystemBlock}
 Debes aplicar el arco narrativo Problema→Proceso→Transformación que te pasa el Strategist. Nunca listas de features. Viewer es el protagonista, WestSide la guía.
 
 Salida SOLO JSON válido, sin markdown:

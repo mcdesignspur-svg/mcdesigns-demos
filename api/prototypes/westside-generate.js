@@ -3,7 +3,7 @@
 // Streams server-sent events as each stage runs.
 
 import { getWestsideEngine } from './ws-engines.js';
-import { saveWsDraft } from '../lib/supabase.js';
+import { saveWsDraft, listWsFeedback } from '../lib/supabase.js';
 
 export const config = { runtime: 'nodejs', maxDuration: 60 };
 
@@ -54,8 +54,12 @@ export default async function handler(req, res) {
     };
 
     try {
-        sse(res, 'orchestrator.start', { input, engine: engine.name });
-        const { output } = await engine.generate({ input, run });
+        // Load last 20 persistent tone-feedback rules (Phase 2 calibration memory)
+        const feedback = await listWsFeedback({ limit: 20, includeEphemeral: false });
+        trace._feedback_count = feedback.length;
+
+        sse(res, 'orchestrator.start', { input, engine: engine.name, feedback_count: feedback.length });
+        const { output } = await engine.generate({ input, run, feedback });
 
         const run_ms = Date.now() - started;
 

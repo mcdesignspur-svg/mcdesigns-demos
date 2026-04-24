@@ -14,17 +14,17 @@ export function getWestsideEngine() {
 
 const directClaudeEngine = {
     name: 'direct',
-    async generate({ input, run }) {
+    async generate({ input, run, feedback = [] }) {
         const { location } = input;
 
         const { context, strategy } = await run('strategist', async () => {
             const context = await contextAgent({ location });
-            const strategy = await strategistAgent({ context, input });
+            const strategy = await strategistAgent({ context, input, feedback });
             return { context, strategy };
         });
 
         const { copy, visual } = await run('copy', async () => {
-            const copy = await copyAgent({ context, strategy, input });
+            const copy = await copyAgent({ context, strategy, input, feedback });
             const visual = await visualAgent({ context, strategy, copy, input });
             return { copy, visual };
         });

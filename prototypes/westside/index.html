@@ -243,8 +243,16 @@
             </div>
 
             <div class="mt-6 p-4 rounded-lg bg-brandSoft/50 border border-brand/20">
-                <div class="text-xs font-mono uppercase tracking-widest text-brand mb-1">Fase 1 · próximo</div>
-                <div class="text-sm text-ink">Migrar estas tres etapas a Claude Managed Agents: Strategy → Copy → QA, con memoria de marca y feedback persistente.</div>
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-xs font-mono uppercase tracking-widest text-brand">Calibration memory</div>
+                    <div class="text-[10px] font-mono text-inkMuted" id="calibration-count">—</div>
+                </div>
+                <div id="calibration-list" class="space-y-1 text-xs text-inkMuted">
+                    <div class="italic">Cargando…</div>
+                </div>
+                <div class="mt-3 text-[10px] font-mono text-inkMuted">
+                    Cada regla persistente se inyecta en los prompts de Strategy + Copy en cada run.
+                </div>
             </div>
         </div>
     </div>
@@ -309,17 +317,143 @@
         }
     }
 
+    // ---------- state ----------
+    let currentDraftId = null;
+    let currentDraft = null;
+
     // ---------- output render ----------
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+    // ---------- calibration memory panel ----------
+    async function loadCalibration() {
+        try {
+            const r = await fetch('/api/prototypes/westside-feedback');
+            const { calibration = [] } = await r.json();
+            renderCalibration(calibration);
+        } catch (err) {
+            document.getElementById('calibration-list').innerHTML = '<div class="italic text-red-600">error al cargar</div>';
+        }
+    }
+    function renderCalibration(rules) {
+        const list = document.getElementById('calibration-list');
+        const count = document.getElementById('calibration-count');
+        count.textContent = `${rules.length} regla${rules.length === 1 ? '' : 's'}`;
+        if (rules.length === 0) {
+            list.innerHTML = '<div class="italic">Sin reglas aún. Usa los botones de tono en el output.</div>';
+            return;
+        }
+        list.innerHTML = rules.map((r, i) => `
+            <div class="flex items-start gap-2 py-1">
+                <span class="text-[10px] font-mono text-brand mt-0.5">${String(i + 1).padStart(2, '0')}</span>
+                <span class="flex-1">${esc(r.rule)}</span>
+                <span class="text-[9px] font-mono text-inkMuted">${new Date(r.created_at).toLocaleDateString()}</span>
+            </div>
+        `).join('');
+    }
+    loadCalibration();
+
+    // ---------- feedback (tone) ----------
+    async function submitTone(rule, btn) {
+        const statusEl = document.getElementById('tone-status');
+        if (btn) btn.disabled = true;
+        if (statusEl) statusEl.textContent = 'guardando…';
+        try {
+            const r = await fetch('/api/prototypes/westside-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kind: 'tone', rule, draft_id: currentDraftId }),
+            });
+            const data = await r.json();
+            if (!r.ok) throw new Error(data.error || 'error');
+            renderCalibration(data.calibration || []);
+            if (statusEl) statusEl.textContent = '✓ guardado · se aplica al próximo run';
+            if (btn) { btn.classList.add('bg-terracotta', 'text-white'); btn.textContent = '✓ ' + btn.textContent; }
+        } catch (err) {
+            if (statusEl) statusEl.textContent = 'error: ' + err.message;
+        } finally {
+            if (btn) setTimeout(() => { btn.disabled = false; }, 2000);
+        }
+    }
+
+    // ---------- regenerate element ----------
+    async function regenerateElement(element, btn) {
+        if (!currentDraftId) { alert('No hay draft activo.'); return; }
+        const originalLabel = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '↻ regenerando…';
+        try {
+            const r = await fetch('/api/prototypes/westside-regenerate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ draft_id: currentDraftId, element }),
+            });
+            const data = await r.json();
+            if (!r.ok) throw new Error(data.error || 'error');
+
+            // Apply patch to UI
+            if (element === 'hooks' && data.patch?.hooks) {
+                Object.assign(currentDraft, { hooks: data.patch.hooks });
+                const container = document.getElementById('hooks-container');
+                container.innerHTML = data.patch.hooks.map((h, i) => `
+                    <div class="flex items-start gap-3 p-3 rounded-lg bg-surfaceLow">
+                        <div class="text-[10px] font-mono text-inkMuted mt-1">V${i + 1}</div>
+                        <div class="flex-1 text-sm">${esc(h)}</div>
+                        <button class="copy-btn text-[10px] font-mono text-inkMuted hover:text-brand" data-copy="${esc(h)}">copiar</button>
+                    </div>
+                `).join('');
+                wireCopyButtons(container);
+            }
+            if (element === 'caption' && data.patch) {
+                if (data.patch.caption_short) {
+                    document.getElementById('caption-short-box').textContent = data.patch.caption_short;
+                    document.getElementById('caption-short-len').textContent = data.patch.caption_short.length;
+                    currentDraft.caption_short = data.patch.caption_short;
+                }
+                if (data.patch.caption_medium) {
+                    document.getElementById('caption-medium-box').textContent = data.patch.caption_medium;
+                    document.getElementById('caption-medium-len').textContent = data.patch.caption_medium.length;
+                    currentDraft.caption_medium = data.patch.caption_medium;
+                }
+            }
+            btn.textContent = '✓ ' + originalLabel;
+            setTimeout(() => { btn.textContent = originalLabel; btn.disabled = false; }, 1500);
+        } catch (err) {
+            btn.textContent = 'error';
+            setTimeout(() => { btn.textContent = originalLabel; btn.disabled = false; }, 2000);
+            alert('Regenerate error: ' + err.message);
+        }
+    }
+
+    function wireCopyButtons(scope) {
+        scope.querySelectorAll('[data-copy]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                navigator.clipboard?.writeText(btn.dataset.copy);
+                btn.textContent = 'copiado ✓';
+                setTimeout(() => btn.textContent = 'copiar', 1500);
+            });
+        });
+    }
+
+    function wireFeedbackButtons() {
+        document.querySelectorAll('.tone-btn').forEach(btn => {
+            btn.addEventListener('click', () => submitTone(btn.dataset.rule, btn));
+        });
+        document.querySelectorAll('.regen-btn').forEach(btn => {
+            btn.addEventListener('click', () => regenerateElement(btn.dataset.element, btn));
+        });
+    }
+
     function renderOutput(payload) {
         const { run_ms, output, draft_id } = payload;
+        currentDraftId = draft_id;
+        currentDraft = output;
         const empty = document.getElementById('output-empty');
         const content = document.getElementById('output-content');
         const meta = document.getElementById('output-meta');
         empty.classList.add('hidden');
         content.classList.remove('hidden');
 
+        const feedbackApplied = payload.output?.feedback_applied_count ?? payload.feedback_count ?? '';
         meta.innerHTML = `run ${(run_ms / 1000).toFixed(1)}s · draft <span class="text-brand">${draft_id ? draft_id.slice(0, 8) : 'local'}</span> · qa <span class="${output.qa?.status === 'pass' ? 'text-green-600' : 'text-amber-600'}">${output.qa?.status || '—'}</span>`;
 
         const hooks = (output.hooks || []).map((h, i) => `
@@ -346,21 +480,45 @@
         `).join('');
 
         content.innerHTML = `
+            <!-- Tone feedback -->
+            <div class="p-4 rounded-lg bg-terracottaSoft/60 border border-terracotta/20">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-terracotta">Calibrar tono · aplica a futuros drafts</div>
+                    <div class="text-[10px] font-mono text-inkMuted" id="tone-status"></div>
+                </div>
+                <div class="flex flex-wrap gap-2" id="tone-buttons">
+                    <button class="tone-btn px-3 py-1.5 rounded-full text-xs border border-terracotta/40 bg-white hover:bg-terracotta hover:text-white transition" data-rule="Más WestSide (spanglish PR, menos español puro)">Más WestSide</button>
+                    <button class="tone-btn px-3 py-1.5 rounded-full text-xs border border-terracotta/40 bg-white hover:bg-terracotta hover:text-white transition" data-rule="Más casual, menos formal">Más casual</button>
+                    <button class="tone-btn px-3 py-1.5 rounded-full text-xs border border-terracotta/40 bg-white hover:bg-terracotta hover:text-white transition" data-rule="Más directo, sin rodeos">Más directo</button>
+                    <button class="tone-btn px-3 py-1.5 rounded-full text-xs border border-terracotta/40 bg-white hover:bg-terracotta hover:text-white transition" data-rule="Hooks más cortos (máximo 8 palabras)">Más corto</button>
+                    <button class="tone-btn px-3 py-1.5 rounded-full text-xs border border-terracotta/40 bg-white hover:bg-terracotta hover:text-white transition" data-rule="Menos corporate, nada de 'team/family/elite'">Menos corporate</button>
+                </div>
+            </div>
+
             <!-- Hooks -->
             <div>
-                <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Hooks · 3 variantes A/B</div>
-                <div class="space-y-2">${hooks}</div>
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted">Hooks · 3 variantes A/B</div>
+                    <button class="regen-btn text-[10px] font-mono text-brand hover:underline" data-element="hooks">↻ regenerar hooks</button>
+                </div>
+                <div class="space-y-2" id="hooks-container">${hooks}</div>
             </div>
 
             <!-- Captions -->
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Caption corta · ${output.caption_short?.length || 0}/280</div>
-                    <div class="p-4 rounded-lg bg-surfaceLow text-sm whitespace-pre-wrap">${esc(output.caption_short)}</div>
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted">Captions</div>
+                    <button class="regen-btn text-[10px] font-mono text-brand hover:underline" data-element="caption">↻ regenerar captions</button>
                 </div>
-                <div>
-                    <div class="text-[11px] font-mono uppercase tracking-widest text-inkMuted mb-2">Caption media · ${output.caption_medium?.length || 0}/600</div>
-                    <div class="p-4 rounded-lg bg-surfaceLow text-sm whitespace-pre-wrap">${esc(output.caption_medium)}</div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-[10px] font-mono text-inkMuted mb-1">Corta · <span id="caption-short-len">${output.caption_short?.length || 0}</span>/280</div>
+                        <div class="p-4 rounded-lg bg-surfaceLow text-sm whitespace-pre-wrap" id="caption-short-box">${esc(output.caption_short)}</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-mono text-inkMuted mb-1">Media · <span id="caption-medium-len">${output.caption_medium?.length || 0}</span>/600</div>
+                        <div class="p-4 rounded-lg bg-surfaceLow text-sm whitespace-pre-wrap" id="caption-medium-box">${esc(output.caption_medium)}</div>
+                    </div>
                 </div>
             </div>
 
@@ -408,14 +566,9 @@
             </div>
         `;
 
-        // Copy buttons
-        content.querySelectorAll('[data-copy]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                navigator.clipboard?.writeText(btn.dataset.copy);
-                btn.textContent = 'copiado ✓';
-                setTimeout(() => btn.textContent = 'copiar', 1500);
-            });
-        });
+        // Wire all buttons
+        wireCopyButtons(content);
+        wireFeedbackButtons();
     }
 
     // ---------- generate (SSE) ----------
@@ -445,7 +598,12 @@
         const qs = new URLSearchParams(payload).toString();
         const es = new EventSource(`/api/prototypes/westside-generate?${qs}`);
 
-        es.addEventListener('orchestrator.start', () => { statusEl.textContent = 'starting…'; });
+        es.addEventListener('orchestrator.start', (e) => {
+            try {
+                const d = JSON.parse(e.data);
+                statusEl.textContent = `starting… (${d.feedback_count || 0} rules applied)`;
+            } catch { statusEl.textContent = 'starting…'; }
+        });
         es.addEventListener('orchestrator.parallel', (e) => {
             const d = JSON.parse(e.data);
             statusEl.textContent = `parallel: ${d.agents.join(' + ')}`;
