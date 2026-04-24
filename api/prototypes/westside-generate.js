@@ -1,14 +1,8 @@
 // Prototype · WestSide Content Studio · SSE orchestrator
 // GET /api/prototypes/westside-generate?location=...&post_type=...&format=...&topic=...
-// Streams server-sent events as each agent runs.
+// Streams server-sent events as each stage runs.
 
-import {
-    contextAgent,
-    strategistAgent,
-    copyAgent,
-    visualAgent,
-    qaAgent,
-} from './ws-agents.js';
+import { getWestsideEngine } from './ws-engines.js';
 import { saveWsDraft } from '../lib/supabase.js';
 
 export const config = { runtime: 'nodejs', maxDuration: 60 };
@@ -41,6 +35,8 @@ export default async function handler(req, res) {
     const input = { location, post_type, format, topic };
     const started = Date.now();
     const trace = {};
+    const engine = getWestsideEngine();
+    trace._engine = engine.name;
 
     const run = async (name, fn) => {
         const t0 = Date.now();
@@ -58,31 +54,8 @@ export default async function handler(req, res) {
     };
 
     try {
-        sse(res, 'orchestrator.start', { input });
-
-        const { context, strategy } = await run('strategist', async () => {
-            const context = await contextAgent({ location });
-            const strategy = await strategistAgent({ context, input });
-            return { context, strategy };
-        });
-
-        const { copy, visual } = await run('copy', async () => {
-            const copy = await copyAgent({ context, strategy, input });
-            const visual = await visualAgent({ context, strategy, copy, input });
-            return { copy, visual };
-        });
-
-        const qa = await run('qa', () => qaAgent({ copy, visual, strategy }));
-
-        const output = {
-            ...copy,
-            image_prompt: visual.image_prompt,
-            shoot_references: visual.shoot_references,
-            suggested_visual_beat: visual.suggested_visual_beat,
-            best_time: context.best_time || null,
-            strategy,
-            qa,
-        };
+        sse(res, 'orchestrator.start', { input, engine: engine.name });
+        const { output } = await engine.generate({ input, run });
 
         const run_ms = Date.now() - started;
 
@@ -92,7 +65,7 @@ export default async function handler(req, res) {
             post_type,
             format,
             topic,
-            status: qa.status === 'pass' ? 'review' : 'draft',
+            status: output.qa?.status === 'pass' ? 'review' : 'draft',
             run_ms,
             agent_trace: trace,
             output,
@@ -100,7 +73,7 @@ export default async function handler(req, res) {
             user_agent: req.headers['user-agent'] || null,
         });
 
-        sse(res, 'orchestrator.done', { draft_id: draftId, run_ms, output });
+        sse(res, 'orchestrator.done', { draft_id: draftId, run_ms, engine: engine.name, output });
         res.end();
     } catch (err) {
         console.error('[ws-generate] error:', err);
