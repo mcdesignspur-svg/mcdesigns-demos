@@ -70,7 +70,7 @@ Hard rules:
 - Return ONLY the JSON object. Nothing else.`;
 
 const QUESTION_PURPOSE = {
-    T1: 'What they build / value proposition',
+    T1: 'What they do / their work / value proposition (any kind: business, project, content, profession)',
     T2: 'Their ideal audience / who they write to',
     T3: 'A recent project or moment that marked them',
     T4: 'In one line, why their work matters (without selling)',
