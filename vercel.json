@@ -13,6 +13,9 @@
     { "source": "/aviation/email-parse", "destination": "/aviation/email-parse.html" },
     { "source": "/burbuja", "destination": "/burbuja/index.html" },
     { "source": "/burbuja/dashboard", "destination": "/burbuja/dashboard.html" },
+    { "source": "/eco", "destination": "/eco/index.html" },
+    { "source": "/eco/builder", "destination": "/eco/builder.html" },
+    { "source": "/eco/studio", "destination": "/eco/studio.html" },
     { "source": "/prototypes/westside", "destination": "/prototypes/westside/index.html" }
   ],
   "headers": [

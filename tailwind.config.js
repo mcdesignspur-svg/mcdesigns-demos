@@ -5,6 +5,7 @@ export default {
         './westside/**/*.html',
         './aviation/**/*.html',
         './burbuja/**/*.html',
+        './eco/**/*.html',
         './prototypes/**/*.html',
         './assets/**/*.js',
     ],

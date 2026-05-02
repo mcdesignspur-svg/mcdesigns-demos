@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Eco — Calibra tu voz</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Anton&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/mammoth@1.7.2/mammoth.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#f9f9f9",
+                        "on-surface": "#1a1c1c",
+                        "on-surface-variant": "#424655",
+                        "primary": "#0056c6",
+                        "primary-deep": "#003a8c",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d9e2ff",
+                        "on-primary-fixed": "#001945",
+                        "accent": "#d97757",
+                        "outline-variant": "#c2c6d8",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        heading: ["Anton", "Impact", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #f9f9f9; }
+        .hero-gradient { background: linear-gradient(135deg, #0056c6 0%, #006df8 100%); }
+        .hero-text-gradient {
+            background: linear-gradient(135deg, #0056c6 0%, #006df8 60%, #d97757 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .grid-bg {
+            background-image: linear-gradient(#0056c6 1px, transparent 1px), linear-gradient(90deg, #0056c6 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.025;
+        }
+        .voice-bar {
+            display: inline-block;
+            width: 2.5px;
+            background: white;
+            border-radius: 2px;
+            margin: 0 1px;
+            animation: voicewave 1.4s ease-in-out infinite;
+        }
+        @keyframes voicewave {
+            0%, 100% { height: 6px; opacity: 0.5; }
+            50% { height: 18px; opacity: 1; }
+        }
+        .voice-bar:nth-child(2) { animation-delay: 0.15s; }
+        .voice-bar:nth-child(3) { animation-delay: 0.3s; }
+        .voice-bar:nth-child(4) { animation-delay: 0.45s; }
+        .voice-bar:nth-child(5) { animation-delay: 0.6s; }
+
+        .progress-bar { transition: width 0.4s ease; }
+
+        /* Chat bubbles */
+        .bubble-eco, .bubble-user {
+            animation: bubbleIn 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+        }
+        @keyframes bubbleIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typing indicator */
+        .typing-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: #0056c6;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+            30% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Lang/Trait chips */
+        .chip-btn {
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 2px solid #c2c6d8;
+            background: white;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1c1c;
+            user-select: none;
+        }
+        .chip-btn:hover {
+            border-color: #0056c6;
+            transform: translateY(-1px);
+        }
+        .chip-btn.disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* Trait chip toggle states */
+        .trait-toggle {
+            cursor: pointer;
+            transition: all 0.18s ease;
+            border: 2px solid #c2c6d8;
+            background: white;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1c1c;
+            user-select: none;
+            position: relative;
+        }
+        .trait-toggle:hover {
+            border-color: #0056c6;
+        }
+        .trait-toggle[data-state="confirmed"] {
+            background: linear-gradient(135deg, #0056c6 0%, #006df8 100%);
+            border-color: #0056c6;
+            color: white;
+        }
+        .trait-toggle[data-state="confirmed"]::before {
+            content: '✓ ';
+        }
+        .trait-toggle[data-state="rejected"] {
+            background: #f9f9f9;
+            border-color: #c2c6d8;
+            color: #424655;
+            text-decoration: line-through;
+            opacity: 0.55;
+        }
+
+        /* File chip */
+        .file-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #d9e2ff;
+            border: 1px solid rgba(0, 86, 198, 0.2);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #001945;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .file-chip button {
+            background: none;
+            border: none;
+            color: #003a8c;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* Input area */
+        textarea#composer {
+            font-family: 'Inter', sans-serif;
+            resize: none;
+            max-height: 200px;
+        }
+
+        .send-btn {
+            transition: all 0.15s ease;
+        }
+        .send-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .send-btn:not(:disabled):hover {
+            transform: scale(1.05);
+        }
+
+        .gen-blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Hide scrollbar on chat */
+        #messages::-webkit-scrollbar { width: 6px; }
+        #messages::-webkit-scrollbar-track { background: transparent; }
+        #messages::-webkit-scrollbar-thumb { background: #c2c6d8; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-on-surface font-sans antialiased min-h-screen flex flex-col">
+
+<!-- Demo Banner -->
+<div class="hero-gradient text-white text-[10px] font-bold uppercase tracking-[0.25em] py-2 text-center relative z-50 flex-shrink-0">
+    Demo privado · MC Designs · Producto en validación
+</div>
+
+<!-- Grid bg -->
+<div class="fixed inset-0 pointer-events-none z-0 grid-bg"></div>
+
+<!-- Nav -->
+<nav class="relative z-30 px-6 md:px-10 py-4 border-b border-outline-variant/40 bg-white/70 backdrop-blur-xl flex-shrink-0">
+    <div class="max-w-3xl mx-auto flex items-center justify-between">
+        <a href="/eco" class="flex items-center gap-2.5">
+            <div class="hero-gradient rounded-lg w-9 h-9 flex items-center justify-center">
+                <div class="flex items-end h-6">
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                </div>
+            </div>
+            <div>
+                <div class="font-heading text-lg tracking-wide leading-none">ECO</div>
+                <div class="text-[9px] uppercase tracking-[0.3em] text-on-surface-variant mt-0.5">Calibrar voz</div>
+            </div>
+        </a>
+        <a href="/eco" class="text-xs text-on-surface-variant hover:text-primary transition">← Salir</a>
+    </div>
+</nav>
+
+<!-- Progress -->
+<div class="sticky top-0 z-20 bg-white/85 backdrop-blur-xl border-b border-outline-variant/40 flex-shrink-0">
+    <div class="max-w-3xl mx-auto px-6 md:px-10 py-2.5 flex items-center gap-4">
+        <div class="flex-1 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
+            <div id="progress" class="progress-bar h-full hero-gradient rounded-full" style="width: 0%"></div>
+        </div>
+        <div class="font-mono text-[11px] text-on-surface-variant" id="progress-text">Empieza</div>
+    </div>
+</div>
+
+<!-- Chat area -->
+<main class="relative z-10 flex-1 overflow-y-auto" id="messages-scroll">
+    <div class="max-w-2xl mx-auto px-4 md:px-6 py-8 space-y-5" id="messages"></div>
+</main>
+
+<!-- Input -->
+<div id="input-bar" class="hidden flex-shrink-0 border-t border-outline-variant/40 bg-white/85 backdrop-blur-xl relative z-30">
+    <form id="input-form" class="max-w-2xl mx-auto px-4 md:px-6 py-3">
+        <div class="flex items-end gap-2 bg-surface border border-outline-variant rounded-2xl px-4 py-3 focus-within:border-primary transition">
+            <textarea id="composer" rows="1" placeholder="Escribe tu respuesta..."
+                class="flex-1 bg-transparent border-0 focus:ring-0 focus:outline-none text-sm leading-relaxed resize-none p-0"></textarea>
+            <button type="submit" id="send-btn" disabled class="send-btn hero-gradient text-on-primary w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14-7-7 14-2-5-5-2z"/></svg>
+            </button>
+        </div>
+        <div class="text-[10px] text-on-surface-variant/60 mt-1.5 px-2">Enter para enviar · Shift+Enter para nueva línea</div>
+    </form>
+</div>
+
+<!-- Generating overlay -->
+<div id="generating" class="hidden fixed inset-0 z-50 bg-white/95 backdrop-blur-md flex items-center justify-center p-6">
+    <div class="bg-white border border-outline-variant rounded-2xl p-10 max-w-md w-full text-center space-y-5 relative overflow-hidden shadow-2xl">
+        <div class="gen-blob bg-primary" style="width: 250px; height: 250px; top: -80px; left: -80px; border-radius: 50%;"></div>
+        <div class="gen-blob bg-accent" style="width: 200px; height: 200px; bottom: -80px; right: -80px; border-radius: 50%;"></div>
+        <div class="relative z-10 space-y-4">
+            <div class="flex items-end h-12 justify-center gap-1">
+                <span class="voice-bar" style="background: #0056c6"></span>
+                <span class="voice-bar" style="background: #0056c6"></span>
+                <span class="voice-bar" style="background: #0056c6"></span>
+                <span class="voice-bar" style="background: #0056c6"></span>
+                <span class="voice-bar" style="background: #0056c6"></span>
+                <span class="voice-bar" style="background: #0056c6"></span>
+                <span class="voice-bar" style="background: #0056c6"></span>
+            </div>
+            <h3 class="font-heading text-3xl tracking-tight uppercase">Generando tu voz</h3>
+            <p class="text-sm text-on-surface-variant" id="gen-status">Compilando voice profile...</p>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // ---------------------------------------------------------------------
+    // Eco — Conversational voice calibration
+    // ---------------------------------------------------------------------
+
+    // Scripted question banks per language. spanglish reuses Spanish.
+    const QUESTIONS = {
+        es: [
+            { id: 'T1', text: 'Pa\' empezar — ¿qué tú construyes? Cuéntame en 2-3 líneas, como si me lo explicaras en una llamada.' },
+            { id: 'T2', text: '¿Quién es la persona ideal a la que tú quieres escribirle? Descríbela.' },
+            { id: 'T3', text: 'Cuéntame de algo reciente — un proyecto, un cliente, un momento de trabajo que te marcó. Lo que pasó, lo que aprendiste.' },
+            { id: 'T4', text: 'En una línea, sin sonar a vendedor — ¿por qué importa lo que tú haces?' },
+            { id: 'T5', text: 'Última: ¿qué te da CRINGE cuando lees algo escrito por AI? Frases, palabras, tics. Sin filtrar.' },
+        ],
+        spanglish: [
+            { id: 'T1', text: 'Para empezar — ¿qué construyes? Tell me en 2-3 líneas, like if you were explaining it en una llamada.' },
+            { id: 'T2', text: '¿Quién es la persona ideal a la que le quieres escribir? Describe her/him.' },
+            { id: 'T3', text: 'Cuéntame de algo reciente — un proyecto, un cliente, un momento de trabajo que te marcó. What happened, what you learned.' },
+            { id: 'T4', text: 'En una línea, sin sonar salesy — why does what you do matter?' },
+            { id: 'T5', text: 'Última: ¿qué te da CRINGE cuando lees AI-generated content? Frases, palabras, tics. Sin filtrar.' },
+        ],
+        en: [
+            { id: 'T1', text: 'To start — what do you build? Tell me in 2-3 lines, like you were explaining it on a call.' },
+            { id: 'T2', text: 'Who\'s the ideal person you want to write to? Describe them.' },
+            { id: 'T3', text: 'Tell me about something recent — a project, a client, a work moment that stuck with you. What happened, what you took from it.' },
+            { id: 'T4', text: 'In one line, without sounding like a salesperson — why does your work matter?' },
+            { id: 'T5', text: 'Last one: what gives you CRINGE when you read AI-generated content? Phrases, words, tics. Unfiltered.' },
+        ],
+        pt: [
+            { id: 'T1', text: 'Para começar — o que você constrói? Me conte em 2-3 linhas, como se estivesse me explicando numa ligação.' },
+            { id: 'T2', text: 'Quem é a pessoa ideal pra quem você quer escrever? Me descreve.' },
+            { id: 'T3', text: 'Me conta de algo recente — um projeto, um cliente, um momento de trabalho que te marcou. O que aconteceu, o que você aprendeu.' },
+            { id: 'T4', text: 'Em uma linha, sem soar como vendedor — por que importa o que você faz?' },
+            { id: 'T5', text: 'Última: o que te dá CRINGE quando você lê conteúdo de AI? Frases, palavras, tiques. Sem filtro.' },
+        ],
+        other: [
+            { id: 'T1', text: 'To start — what do you build? Tell me in 2-3 lines.' },
+            { id: 'T2', text: 'Who\'s the ideal person you want to write to? Describe them.' },
+            { id: 'T3', text: 'Tell me about something recent — a project, a client, a moment that marked you.' },
+            { id: 'T4', text: 'In one line, without sounding salesy — why does your work matter?' },
+            { id: 'T5', text: 'Last: what gives you CRINGE when you read AI text? Phrases, words, tics. Unfiltered.' },
+        ],
+    };
+
+    const INTROS = {
+        es: 'OK. Te voy a hacer 5 preguntas cortas. Cómo respondes importa más que qué — escribe como escribes en serio.',
+        spanglish: 'OK. Te voy a hacer 5 quick questions. How you answer matters más que qué — escribe como escribes for real.',
+        en: 'OK. I\'ll ask you 5 short questions. How you answer matters more than what — write the way you actually write.',
+        pt: 'OK. Vou fazer 5 perguntas curtas. Como você responde importa mais que o quê — escreva como você realmente escreve.',
+        other: 'OK. I\'ll ask 5 short questions. How you answer matters more than what — write naturally.',
+    };
+
+    const WELCOMES = {
+        es: '¡Hey! Soy Eco. Antes de empezar — ¿en qué idioma te suena natural escribir?',
+        spanglish: '¡Hey! Soy Eco. Antes de empezar — ¿en qué idioma te suena natural escribir?',
+        en: 'Hey, I\'m Eco. Before we start — what language sounds natural for you to write in?',
+        pt: 'E aí, sou Eco. Antes de começar — em que idioma é natural pra você escrever?',
+        other: 'Hi, I\'m Eco. Before we start — what language sounds natural for you to write in?',
+    };
+
+    const STRINGS = {
+        es: {
+            traits_intro: 'Listo. Mira lo que estoy captando de tu voz — toca para confirmar (verde) o tachar lo que NO eres. Lo que dejes intacto cuenta como confirmado.',
+            context_intro: 'Una última cosa opcional — ¿tienes algún texto tuyo que quieras que vea? Caption, email, post. Refina mucho. O sáltalo y generamos.',
+            generate_btn: 'Generar mi voice profile →',
+            skip_btn: 'Sin texto — generar',
+            placeholder: 'Escribe tu respuesta...',
+            traits_continue: 'Continuar →',
+            paste_label: 'Pegar texto',
+            upload_label: 'Subir archivo',
+            paste_placeholder: 'Pega aquí algo que hayas escrito tú...',
+            chars_count: 'caracteres',
+        },
+        spanglish: {
+            traits_intro: 'Listo. Mira lo que estoy captando de tu voz — tap pa\' confirmar (verde) o tachar lo que NO eres. Lo que dejes intacto cuenta como confirmado.',
+            context_intro: 'Una last optional thing — got any text you wrote you want me to see? Caption, email, post. It refines a lot. O sáltalo y generamos.',
+            generate_btn: 'Generar mi voice profile →',
+            skip_btn: 'Sin texto — generar',
+            placeholder: 'Escribe tu respuesta...',
+            traits_continue: 'Continuar →',
+            paste_label: 'Pegar texto',
+            upload_label: 'Subir archivo',
+            paste_placeholder: 'Pega aquí algo que hayas escrito tú...',
+            chars_count: 'characters',
+        },
+        en: {
+            traits_intro: 'Done. Here\'s what I\'m catching about your voice — tap to confirm (green) or strike out what\'s NOT you. Anything you leave alone counts as confirmed.',
+            context_intro: 'One last optional thing — got any text you wrote you want me to see? Caption, email, post. Refines a lot. Or skip and we generate.',
+            generate_btn: 'Generate my voice profile →',
+            skip_btn: 'No text — generate',
+            placeholder: 'Type your answer...',
+            traits_continue: 'Continue →',
+            paste_label: 'Paste text',
+            upload_label: 'Upload file',
+            paste_placeholder: 'Paste something you wrote...',
+            chars_count: 'characters',
+        },
+        pt: {
+            traits_intro: 'Pronto. Olha o que estou captando da sua voz — toque pra confirmar (verde) ou riscar o que NÃO é você. O que deixar intacto conta como confirmado.',
+            context_intro: 'Uma última coisa opcional — tem algum texto seu que quer que eu veja? Caption, email, post. Refina muito. Ou pula e a gente gera.',
+            generate_btn: 'Gerar meu voice profile →',
+            skip_btn: 'Sem texto — gerar',
+            placeholder: 'Digite sua resposta...',
+            traits_continue: 'Continuar →',
+            paste_label: 'Colar texto',
+            upload_label: 'Enviar arquivo',
+            paste_placeholder: 'Cole algo que você escreveu...',
+            chars_count: 'caracteres',
+        },
+        other: {
+            traits_intro: 'Done. Here\'s what I\'m catching about your voice — tap to confirm or strike out what\'s NOT you.',
+            context_intro: 'Optional — got text you wrote you want me to see? Or skip.',
+            generate_btn: 'Generate voice profile →',
+            skip_btn: 'No text — generate',
+            placeholder: 'Type your answer...',
+            traits_continue: 'Continue →',
+            paste_label: 'Paste text',
+            upload_label: 'Upload file',
+            paste_placeholder: 'Paste something you wrote...',
+            chars_count: 'characters',
+        },
+    };
+
+    const LANG_LABELS = {
+        es: 'Español', en: 'English', spanglish: 'Spanglish', pt: 'Português', other: 'Otro',
+    };
+
+    // ---------------------------------------------------------------------
+    // State
+    // ---------------------------------------------------------------------
+    const state = {
+        lang: null,
+        currentQ: 0,
+        transcript: [],
+        inferredTraits: [],
+        confirmedTraits: new Set(),
+        rejectedTraits: new Set(),
+        contextSamples: [],
+        status: 'init',
+    };
+
+    // ---------------------------------------------------------------------
+    // DOM refs
+    // ---------------------------------------------------------------------
+    const messagesEl = document.getElementById('messages');
+    const messagesScroll = document.getElementById('messages-scroll');
+    const inputBar = document.getElementById('input-bar');
+    const inputForm = document.getElementById('input-form');
+    const composer = document.getElementById('composer');
+    const sendBtn = document.getElementById('send-btn');
+    const progressFill = document.getElementById('progress');
+    const progressText = document.getElementById('progress-text');
+    const generating = document.getElementById('generating');
+
+    // ---------------------------------------------------------------------
+    // PDF.js (lazy)
+    // ---------------------------------------------------------------------
+    let _pdfjsPromise = null;
+    function loadPdfJs() {
+        if (_pdfjsPromise) return _pdfjsPromise;
+        _pdfjsPromise = import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs')
+            .then(pdfjs => {
+                pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+                return pdfjs;
+            });
+        return _pdfjsPromise;
+    }
+
+    // ---------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function scrollToBottom(smooth = true) {
+        messagesScroll.scrollTo({ top: messagesScroll.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    function makeAvatar() {
+        return `
+        <div class="hero-gradient rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0">
+            <div class="flex items-end h-5">
+                <span class="voice-bar"></span>
+                <span class="voice-bar"></span>
+                <span class="voice-bar"></span>
+                <span class="voice-bar"></span>
+                <span class="voice-bar"></span>
+            </div>
+        </div>`;
+    }
+
+    function addEcoMessage(text, opts = {}) {
+        const wrap = document.createElement('div');
+        wrap.className = 'bubble-eco flex gap-3 items-start';
+        wrap.innerHTML = `
+            ${makeAvatar()}
+            <div class="bg-white border border-outline-variant rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] shadow-sm">
+                <div class="text-sm leading-relaxed text-on-surface eco-text">${escapeHtml(text)}</div>
+                <div class="extra-content mt-3"></div>
+            </div>`;
+        messagesEl.appendChild(wrap);
+        scrollToBottom();
+        return wrap.querySelector('.extra-content');
+    }
+
+    function addUserMessage(text) {
+        const wrap = document.createElement('div');
+        wrap.className = 'bubble-user flex justify-end';
+        wrap.innerHTML = `
+            <div class="bg-primary-fixed border border-primary/15 text-on-primary-fixed rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%]">
+                <div class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</div>
+            </div>`;
+        messagesEl.appendChild(wrap);
+        scrollToBottom();
+    }
+
+    function showTyping() {
+        const wrap = document.createElement('div');
+        wrap.id = 'typing-indicator';
+        wrap.className = 'bubble-eco flex gap-3 items-start';
+        wrap.innerHTML = `
+            ${makeAvatar()}
+            <div class="bg-white border border-outline-variant rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>`;
+        messagesEl.appendChild(wrap);
+        scrollToBottom();
+    }
+
+    function hideTyping() {
+        const el = document.getElementById('typing-indicator');
+        if (el) el.remove();
+    }
+
+    function updateProgress() {
+        const totalSteps = 6; // 5 questions + traits
+        let step = Math.min(state.currentQ, 5);
+        if (state.status === 'context' || state.status === 'generating' || state.status === 'done') step = 6;
+        const pct = Math.round((step / totalSteps) * 100);
+        progressFill.style.width = pct + '%';
+
+        if (!state.lang) {
+            progressText.textContent = 'Empieza';
+        } else if (step <= 4) {
+            const labels = {
+                es: 'Pregunta', spanglish: 'Pregunta', en: 'Question', pt: 'Pergunta', other: 'Question',
+            };
+            progressText.textContent = `${labels[state.lang]} ${step + 1} / 5`;
+        } else if (step === 5) {
+            progressText.textContent = state.lang === 'en' ? 'Reviewing voice' : 'Revisando voz';
+        } else {
+            progressText.textContent = state.lang === 'en' ? 'Final step' : 'Paso final';
+        }
+    }
+
+    function enableInput() {
+        const t = STRINGS[state.lang] || STRINGS.en;
+        composer.placeholder = t.placeholder;
+        inputBar.classList.remove('hidden');
+        composer.disabled = false;
+        sendBtn.disabled = composer.value.trim().length < 5;
+        composer.focus();
+    }
+
+    function disableInput() {
+        composer.disabled = true;
+        sendBtn.disabled = true;
+    }
+
+    function autoGrowComposer() {
+        composer.style.height = 'auto';
+        composer.style.height = Math.min(composer.scrollHeight, 200) + 'px';
+    }
+
+    composer.addEventListener('input', () => {
+        sendBtn.disabled = composer.value.trim().length < 5;
+        autoGrowComposer();
+    });
+
+    composer.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!sendBtn.disabled) inputForm.requestSubmit();
+        }
+    });
+
+    inputForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = composer.value.trim();
+        if (text.length < 5) return;
+        composer.value = '';
+        autoGrowComposer();
+        handleUserAnswer(text);
+    });
+
+    // ---------------------------------------------------------------------
+    // Flow
+    // ---------------------------------------------------------------------
+
+    async function start() {
+        await sleep(400);
+        showTyping();
+        await sleep(900);
+        hideTyping();
+
+        // Welcome with lang chips inline
+        const extra = addEcoMessage(WELCOMES.es); // start in es; will switch after pick
+        const grid = document.createElement('div');
+        grid.className = 'flex flex-wrap gap-2';
+        Object.entries(LANG_LABELS).forEach(([value, label]) => {
+            const btn = document.createElement('button');
+            btn.className = 'chip-btn';
+            btn.textContent = label;
+            btn.dataset.value = value;
+            btn.addEventListener('click', () => handleLangPick(value, grid));
+            grid.appendChild(btn);
+        });
+        extra.appendChild(grid);
+    }
+
+    async function handleLangPick(value, gridEl) {
+        if (state.lang) return;
+        state.lang = value;
+        // Disable all chips
+        gridEl.querySelectorAll('.chip-btn').forEach(b => b.classList.add('disabled'));
+        // Highlight selected
+        const selected = gridEl.querySelector(`[data-value="${value}"]`);
+        if (selected) {
+            selected.style.background = 'linear-gradient(135deg, #0056c6 0%, #006df8 100%)';
+            selected.style.color = 'white';
+            selected.style.borderColor = '#0056c6';
+        }
+
+        // User echo
+        addUserMessage(LANG_LABELS[value]);
+        await sleep(400);
+
+        // Welcome in user's language
+        showTyping();
+        await sleep(900);
+        hideTyping();
+        addEcoMessage(INTROS[value] || INTROS.en);
+
+        await sleep(700);
+
+        // First question
+        showTyping();
+        await sleep(800);
+        hideTyping();
+        const q = QUESTIONS[value][0];
+        addEcoMessage(q.text);
+
+        state.currentQ = 0;
+        state.status = 'awaiting';
+        updateProgress();
+        enableInput();
+    }
+
+    async function handleUserAnswer(text) {
+        if (state.status !== 'awaiting') return;
+
+        disableInput();
+        state.status = 'acking';
+
+        addUserMessage(text);
+
+        const q = QUESTIONS[state.lang][state.currentQ];
+        const newTurn = { questionId: q.id, question: q.text, answer: text };
+
+        await sleep(450);
+        showTyping();
+
+        // Call ack API
+        let ack = null;
+        try {
+            const res = await fetch('/api/eco-ack', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mode: 'turn',
+                    lang: state.lang,
+                    transcript: state.transcript, // prior turns
+                    latestQuestion: q.text,
+                    latestAnswer: text,
+                }),
+            });
+            const data = await res.json();
+            if (res.ok && data.ack) ack = data.ack;
+        } catch (e) { /* fallback below */ }
+
+        if (!ack) {
+            ack = state.lang === 'en' ? 'Got it.' : state.lang === 'pt' ? 'Anotado.' : 'Anotado.';
+        }
+
+        // Push turn AFTER ack so transcript reflects history
+        state.transcript.push(newTurn);
+
+        // Min total typing time
+        await sleep(200);
+        hideTyping();
+        addEcoMessage(ack);
+
+        state.currentQ++;
+        updateProgress();
+
+        if (state.currentQ < QUESTIONS[state.lang].length) {
+            // Next question
+            await sleep(700);
+            showTyping();
+            await sleep(900);
+            hideTyping();
+            const nextQ = QUESTIONS[state.lang][state.currentQ];
+            addEcoMessage(nextQ.text);
+            state.status = 'awaiting';
+            enableInput();
+        } else {
+            // Move to traits flow
+            state.status = 'traits';
+            inputBar.classList.add('hidden');
+            await beginTraitsFlow();
+        }
+    }
+
+    async function beginTraitsFlow() {
+        await sleep(700);
+        showTyping();
+
+        let traits = [];
+        try {
+            const res = await fetch('/api/eco-ack', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mode: 'traits',
+                    lang: state.lang,
+                    transcript: state.transcript,
+                }),
+            });
+            const data = await res.json();
+            if (res.ok && Array.isArray(data.traits)) traits = data.traits;
+        } catch (e) { /* fallback */ }
+
+        if (traits.length === 0) {
+            traits = state.lang === 'en'
+                ? ['Direct', 'Punchy sentences', 'Personal', 'Anti-jargon', 'Conviction-driven', 'Specific examples']
+                : ['Directo', 'Punchy', 'Personal', 'Anti-corporate', 'Con conviction', 'Ejemplos concretos'];
+        }
+
+        state.inferredTraits = traits;
+
+        await sleep(300);
+        hideTyping();
+
+        const t = STRINGS[state.lang] || STRINGS.en;
+        const extra = addEcoMessage(t.traits_intro);
+
+        // Render traits + continue button
+        const grid = document.createElement('div');
+        grid.className = 'flex flex-wrap gap-1.5 mt-1';
+        traits.forEach(trait => {
+            const btn = document.createElement('button');
+            btn.className = 'trait-toggle';
+            btn.textContent = trait;
+            btn.dataset.state = 'unset';
+            btn.addEventListener('click', () => toggleTrait(btn, trait));
+            grid.appendChild(btn);
+        });
+
+        const continueBtn = document.createElement('button');
+        continueBtn.className = 'mt-3 w-full hero-gradient text-on-primary px-5 py-3 rounded-lg text-xs uppercase tracking-[0.2em] font-bold hover:scale-[1.01] transition';
+        continueBtn.textContent = t.traits_continue;
+        continueBtn.addEventListener('click', () => proceedFromTraits(continueBtn));
+
+        extra.appendChild(grid);
+        extra.appendChild(continueBtn);
+        scrollToBottom();
+        updateProgress();
+    }
+
+    function toggleTrait(btn, trait) {
+        const cur = btn.dataset.state || 'unset';
+        const next = cur === 'unset' ? 'confirmed' : cur === 'confirmed' ? 'rejected' : 'unset';
+        btn.dataset.state = next;
+        if (next === 'confirmed') {
+            state.confirmedTraits.add(trait);
+            state.rejectedTraits.delete(trait);
+        } else if (next === 'rejected') {
+            state.rejectedTraits.add(trait);
+            state.confirmedTraits.delete(trait);
+        } else {
+            state.confirmedTraits.delete(trait);
+            state.rejectedTraits.delete(trait);
+        }
+    }
+
+    async function proceedFromTraits(btn) {
+        // Default unset chips → confirmed
+        state.inferredTraits.forEach(t => {
+            if (!state.confirmedTraits.has(t) && !state.rejectedTraits.has(t)) {
+                state.confirmedTraits.add(t);
+            }
+        });
+        if (btn) btn.disabled = true;
+
+        await sleep(400);
+        showTyping();
+        await sleep(900);
+        hideTyping();
+
+        await showContextStep();
+    }
+
+    async function showContextStep() {
+        state.status = 'context';
+        updateProgress();
+
+        const t = STRINGS[state.lang] || STRINGS.en;
+        const extra = addEcoMessage(t.context_intro);
+
+        // Mode toggle + paste/upload UI
+        const wrap = document.createElement('div');
+        wrap.className = 'space-y-3 mt-1';
+
+        // Mode toggle
+        const toggle = document.createElement('div');
+        toggle.className = 'inline-flex bg-surface p-1 rounded-lg border border-outline-variant';
+        const pasteBtn = document.createElement('button');
+        pasteBtn.className = 'px-3 py-1.5 rounded-md text-[11px] uppercase tracking-widest font-bold hero-gradient text-on-primary';
+        pasteBtn.textContent = t.paste_label;
+        const uploadBtn = document.createElement('button');
+        uploadBtn.className = 'px-3 py-1.5 rounded-md text-[11px] uppercase tracking-widest font-bold text-on-surface-variant';
+        uploadBtn.textContent = t.upload_label;
+        toggle.appendChild(pasteBtn);
+        toggle.appendChild(uploadBtn);
+
+        // Paste container
+        const pasteWrap = document.createElement('div');
+        pasteWrap.className = 'space-y-2';
+        for (let i = 0; i < 3; i++) {
+            const ta = document.createElement('textarea');
+            ta.rows = 3;
+            ta.maxLength = 6000;
+            ta.placeholder = i === 0 ? t.paste_placeholder : '(opcional)';
+            ta.dataset.idx = i;
+            ta.className = 'w-full bg-surface border border-outline-variant/60 rounded-lg px-3 py-2 text-sm focus:border-primary focus:bg-white focus:outline-none transition resize-none';
+            pasteWrap.appendChild(ta);
+        }
+
+        // Upload container
+        const uploadWrap = document.createElement('div');
+        uploadWrap.className = 'hidden space-y-2';
+        const dropzone = document.createElement('label');
+        dropzone.className = 'block border-2 border-dashed border-primary/40 rounded-lg p-5 text-center cursor-pointer hover:border-primary hover:bg-primary-fixed/30 transition';
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.multiple = true;
+        fileInput.accept = '.txt,.md,.pdf,.docx';
+        fileInput.className = 'hidden';
+        dropzone.innerHTML = '<div class="font-bold text-xs">Arrastra o click</div><div class="text-[10px] text-on-surface-variant mt-1">.txt, .md, .pdf, .docx · max 5 archivos · 5MB c/u</div>';
+        dropzone.appendChild(fileInput);
+        const fileListEl = document.createElement('div');
+        fileListEl.className = 'flex flex-wrap gap-1.5';
+        const fileStatusEl = document.createElement('div');
+        fileStatusEl.className = 'text-[11px] text-on-surface-variant';
+        uploadWrap.appendChild(dropzone);
+        uploadWrap.appendChild(fileListEl);
+        uploadWrap.appendChild(fileStatusEl);
+
+        // Bottom buttons
+        const actions = document.createElement('div');
+        actions.className = 'flex gap-2 pt-1';
+        const generateBtn = document.createElement('button');
+        generateBtn.className = 'flex-1 hero-gradient text-on-primary px-5 py-3 rounded-lg text-xs uppercase tracking-[0.2em] font-bold hover:scale-[1.01] transition';
+        generateBtn.textContent = t.generate_btn;
+        const skipBtn = document.createElement('button');
+        skipBtn.className = 'bg-white border border-outline-variant text-on-surface px-4 py-3 rounded-lg text-xs uppercase tracking-[0.2em] font-bold hover:border-primary transition';
+        skipBtn.textContent = t.skip_btn;
+        actions.appendChild(generateBtn);
+        // (skip is redundant w/ generate when no text — let user just click generate)
+
+        wrap.appendChild(toggle);
+        wrap.appendChild(pasteWrap);
+        wrap.appendChild(uploadWrap);
+        wrap.appendChild(actions);
+        extra.appendChild(wrap);
+        scrollToBottom();
+
+        // Toggle behaviour
+        pasteBtn.addEventListener('click', () => {
+            pasteBtn.classList.add('hero-gradient', 'text-on-primary'); pasteBtn.classList.remove('text-on-surface-variant');
+            uploadBtn.classList.remove('hero-gradient', 'text-on-primary'); uploadBtn.classList.add('text-on-surface-variant');
+            pasteWrap.classList.remove('hidden'); uploadWrap.classList.add('hidden');
+        });
+        uploadBtn.addEventListener('click', () => {
+            uploadBtn.classList.add('hero-gradient', 'text-on-primary'); uploadBtn.classList.remove('text-on-surface-variant');
+            pasteBtn.classList.remove('hero-gradient', 'text-on-primary'); pasteBtn.classList.add('text-on-surface-variant');
+            uploadWrap.classList.remove('hidden'); pasteWrap.classList.add('hidden');
+        });
+
+        // File handling
+        const uploadedFiles = [];
+        function renderFileList() {
+            fileListEl.innerHTML = '';
+            uploadedFiles.forEach((f, i) => {
+                const chip = document.createElement('div');
+                chip.className = 'file-chip';
+                chip.innerHTML = `<span>${escapeHtml(f.name)}</span><span class="opacity-50">${(f.text.length/1000).toFixed(1)}k</span><button data-rm="${i}">×</button>`;
+                chip.querySelector('button').addEventListener('click', () => {
+                    uploadedFiles.splice(i, 1);
+                    renderFileList();
+                });
+                fileListEl.appendChild(chip);
+            });
+        }
+        async function extractText(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (ext === 'txt' || ext === 'md') return await file.text();
+            if (ext === 'pdf') {
+                const pdfjs = await loadPdfJs();
+                const buf = await file.arrayBuffer();
+                const pdf = await pdfjs.getDocument({ data: buf }).promise;
+                let out = '';
+                for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
+                    const page = await pdf.getPage(i);
+                    const c = await page.getTextContent();
+                    out += c.items.map(it => it.str).join(' ') + '\n\n';
+                }
+                return out;
+            }
+            if (ext === 'docx') {
+                if (!window.mammoth) throw new Error('DOCX parser no cargó');
+                const buf = await file.arrayBuffer();
+                const result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+                return result.value || '';
+            }
+            throw new Error(`Formato no soportado: .${ext}`);
+        }
+        async function handleFiles(files) {
+            const arr = Array.from(files);
+            if (uploadedFiles.length + arr.length > 5) {
+                fileStatusEl.textContent = 'Max 5 archivos.';
+                return;
+            }
+            for (const f of arr) {
+                if (f.size > 5 * 1024 * 1024) {
+                    fileStatusEl.textContent = `${f.name} > 5MB`;
+                    continue;
+                }
+                fileStatusEl.textContent = `Procesando ${f.name}...`;
+                try {
+                    const text = await extractText(f);
+                    if (!text.trim()) { fileStatusEl.textContent = `${f.name}: vacío`; continue; }
+                    uploadedFiles.push({ name: f.name, text: text.slice(0, 12000) });
+                    fileStatusEl.textContent = `Listo: ${f.name}`;
+                } catch (e) {
+                    fileStatusEl.textContent = `Error: ${e.message}`;
+                }
+            }
+            renderFileList();
+            setTimeout(() => { fileStatusEl.textContent = ''; }, 2500);
+        }
+        fileInput.addEventListener('change', e => handleFiles(e.target.files));
+        dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('bg-primary-fixed'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('bg-primary-fixed'));
+        dropzone.addEventListener('drop', e => {
+            e.preventDefault(); dropzone.classList.remove('bg-primary-fixed');
+            if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+        });
+
+        // Generate
+        generateBtn.addEventListener('click', () => {
+            // Collect samples
+            const samples = [];
+            if (!uploadWrap.classList.contains('hidden')) {
+                uploadedFiles.forEach(f => {
+                    if (f.text.trim().length > 50) samples.push({ source: f.name, text: f.text.trim() });
+                });
+            } else {
+                pasteWrap.querySelectorAll('textarea').forEach(ta => {
+                    const v = ta.value.trim();
+                    if (v.length > 50) samples.push({ source: `Texto ${parseInt(ta.dataset.idx)+1}`, text: v });
+                });
+            }
+            state.contextSamples = samples;
+            generateBtn.disabled = true;
+            generateBtn.textContent = '...';
+            generateProfile();
+        });
+    }
+
+    async function generateProfile() {
+        state.status = 'generating';
+        updateProgress();
+        generating.classList.remove('hidden');
+        animateGenStatus();
+
+        const payload = {
+            mode: 'conversation',
+            lang: state.lang,
+            transcript: state.transcript,
+            confirmedTraits: Array.from(state.confirmedTraits),
+            rejectedTraits: Array.from(state.rejectedTraits),
+            samples: state.contextSamples,
+        };
+
+        try {
+            const res = await fetch('/api/eco-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed');
+
+            const profile = {
+                id: data.id || ('local-' + Math.random().toString(36).slice(2, 10)),
+                createdAt: Date.now(),
+                profile: data.profile,
+                summary: data.summary,
+                answers: {
+                    mode: 'conversation',
+                    lang: state.lang,
+                    brand: extractAnswer('T1'),
+                    audience: extractAnswer('T2'),
+                    confirmedTraits: Array.from(state.confirmedTraits),
+                },
+                samplesCount: state.contextSamples.length,
+            };
+            localStorage.setItem('eco_active_profile', JSON.stringify(profile));
+            window.location.href = '/eco/studio';
+        } catch (err) {
+            generating.classList.add('hidden');
+            alert('Falló la generación: ' + err.message);
+            state.status = 'context';
+        }
+    }
+
+    function extractAnswer(qid) {
+        const turn = state.transcript.find(t => t.questionId === qid);
+        return turn ? turn.answer : null;
+    }
+
+    function animateGenStatus() {
+        const stepsByLang = {
+            es: ['Compilando voice profile...', 'Mapeando vocabulario...', 'Detectando ritmo...', 'Cruzando con tus textos...', 'Casi listo...'],
+            spanglish: ['Compilando voice profile...', 'Mapping vocab...', 'Detectando rhythm...', 'Crossing con tus textos...', 'Casi listo...'],
+            en: ['Compiling voice profile...', 'Mapping vocabulary...', 'Detecting rhythm...', 'Cross-referencing samples...', 'Almost there...'],
+            pt: ['Compilando voice profile...', 'Mapeando vocabulário...', 'Detectando ritmo...', 'Quase lá...'],
+            other: ['Compiling profile...', 'Mapping voice...', 'Almost there...'],
+        };
+        const steps = stepsByLang[state.lang] || stepsByLang.en;
+        let i = 0;
+        const el = document.getElementById('gen-status');
+        const tick = () => {
+            if (generating.classList.contains('hidden')) return;
+            el.textContent = steps[i % steps.length];
+            i++;
+            setTimeout(tick, 1400);
+        };
+        tick();
+    }
+
+    // ---------------------------------------------------------------------
+    // Boot
+    // ---------------------------------------------------------------------
+    start();
+</script>
+
+</body>
+</html>

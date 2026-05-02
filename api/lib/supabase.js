@@ -116,3 +116,68 @@ export async function listWsDrafts(limit = 30) {
     return [];
   }
 }
+
+/**
+ * Eco — save a generated voice profile. Returns the new id, or null if Supabase isn't configured.
+ */
+export async function saveEcoProfile({ answers, profile, summary, samples_count }) {
+  const client = getClient();
+  if (!client) return null;
+  try {
+    const { data, error } = await client
+      .from('eco_voice_profiles')
+      .insert({
+        answers,
+        profile,
+        summary,
+        samples_count: samples_count || 0,
+      })
+      .select('id')
+      .single();
+    if (error) throw error;
+    return data?.id || null;
+  } catch (err) {
+    console.error('[supabase] saveEcoProfile error:', err?.message);
+    return null;
+  }
+}
+
+/**
+ * Eco — attach email + willingness to an existing profile when user opts in.
+ */
+export async function attachEmailToProfile(id, { email, willingness }) {
+  const client = getClient();
+  if (!client || !id) return false;
+  try {
+    const { error } = await client
+      .from('eco_voice_profiles')
+      .update({ email, willingness, last_active_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('[supabase] attachEmailToProfile error:', err?.message);
+    return false;
+  }
+}
+
+/**
+ * Eco — append a usage/validation event. Fire-and-forget.
+ */
+export async function logEcoEvent({ profile_id, kind, rating, directive, input_chars, output_chars, metadata }) {
+  const client = getClient();
+  if (!client) return;
+  try {
+    await client.from('eco_events').insert({
+      profile_id: profile_id || null,
+      kind,
+      rating: rating || null,
+      directive: directive || null,
+      input_chars: input_chars || null,
+      output_chars: output_chars || null,
+      metadata: metadata || {},
+    });
+  } catch (err) {
+    console.error('[supabase] logEcoEvent error:', err?.message);
+  }
+}

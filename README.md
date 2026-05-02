@@ -34,6 +34,7 @@ mcdesigns-demos/
 | WestSide Fitness | `/westside` | Pilar 1 (leads) + dashboard simulado | Activo |
 | Parts Aviation Solutions | `/aviation` + `/aviation/dashboard` + `/aviation/email-parse` | RFQ triage + Ops center + Email parser (Claude Haiku) | Activo |
 | Burbuja Social | `/burbuja` | CRM centralizado 3 líneas (agencia/foto/alquiler) + AI routing | Activo |
+| Eco (MC Designs producto) | `/eco` + `/eco/builder` + `/eco/studio` | Voice cloning para marcas personales — cuestionario + uploads + humanizer (Sonnet 4.6) | Validación |
 
 ## Local dev
 

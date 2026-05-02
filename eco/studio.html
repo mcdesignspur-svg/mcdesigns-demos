@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Eco — Studio</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Anton&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#f9f9f9",
+                        "on-surface": "#1a1c1c",
+                        "on-surface-variant": "#424655",
+                        "primary": "#0056c6",
+                        "primary-deep": "#003a8c",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d9e2ff",
+                        "on-primary-fixed": "#001945",
+                        "accent": "#d97757",
+                        "outline-variant": "#c2c6d8",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        heading: ["Anton", "Impact", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #f9f9f9; }
+        .hero-gradient { background: linear-gradient(135deg, #0056c6 0%, #006df8 100%); }
+        .hero-text-gradient {
+            background: linear-gradient(135deg, #0056c6 0%, #006df8 60%, #d97757 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .grid-bg {
+            background-image: linear-gradient(#0056c6 1px, transparent 1px), linear-gradient(90deg, #0056c6 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.025;
+        }
+        .voice-bar {
+            display: inline-block;
+            width: 3px;
+            background: white;
+            border-radius: 2px;
+            margin: 0 1.5px;
+            animation: voicewave 1.4s ease-in-out infinite;
+        }
+        @keyframes voicewave {
+            0%, 100% { height: 8px; opacity: 0.5; }
+            50% { height: 24px; opacity: 1; }
+        }
+        .voice-bar:nth-child(2) { animation-delay: 0.15s; }
+        .voice-bar:nth-child(3) { animation-delay: 0.3s; }
+        .voice-bar:nth-child(4) { animation-delay: 0.45s; }
+        .voice-bar:nth-child(5) { animation-delay: 0.6s; }
+        textarea { font-family: 'Inter', sans-serif; }
+        .typing::after {
+            content: '▍';
+            display: inline-block;
+            color: #0056c6;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .trait-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: white;
+            border: 1px solid #c2c6d8;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="text-on-surface font-sans antialiased min-h-screen">
+
+<!-- Demo Banner -->
+<div class="hero-gradient text-white text-[10px] font-bold uppercase tracking-[0.25em] py-2 text-center relative z-50">
+    Demo privado · MC Designs · Producto en validación
+</div>
+
+<!-- Grid bg -->
+<div class="fixed inset-0 pointer-events-none z-0 grid-bg"></div>
+
+<!-- Nav -->
+<nav class="relative z-30 px-6 md:px-10 py-5 border-b border-outline-variant/40 bg-white/70 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <a href="/eco" class="flex items-center gap-2.5">
+            <div class="hero-gradient rounded-lg w-9 h-9 flex items-center justify-center">
+                <div class="flex items-end h-6">
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                    <span class="voice-bar"></span>
+                </div>
+            </div>
+            <div>
+                <div class="font-heading text-lg tracking-wide leading-none">ECO</div>
+                <div class="text-[9px] uppercase tracking-[0.3em] text-on-surface-variant mt-0.5">Studio</div>
+            </div>
+        </a>
+        <div class="flex items-center gap-4">
+            <button id="reset-btn" class="text-xs text-on-surface-variant hover:text-primary transition">Recalibrar</button>
+            <a href="/eco" class="text-xs text-on-surface-variant hover:text-primary transition">← Inicio</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Empty state -->
+<div id="empty-state" class="hidden relative z-10 px-6 md:px-10 py-20">
+    <div class="max-w-2xl mx-auto bg-white border border-outline-variant rounded-2xl p-10 text-center space-y-5">
+        <div class="font-heading text-3xl tracking-tight uppercase">No tienes voice profile</div>
+        <p class="text-sm text-on-surface-variant">Arranca con el cuestionario para crear tu voz.</p>
+        <a href="/eco/builder" class="inline-block hero-gradient text-on-primary px-6 py-3 rounded-lg text-xs uppercase tracking-widest font-bold">
+            Calibrar mi voz →
+        </a>
+    </div>
+</div>
+
+<!-- Main app -->
+<main id="app" class="hidden relative z-10 px-6 md:px-10 py-8 pb-24">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Profile header -->
+        <div class="bg-white border border-outline-variant rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4">
+            <div class="flex-1 space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-accent">Tu voice profile</span>
+                    <span class="text-[10px] font-mono text-on-surface-variant" id="profile-id">·</span>
+                </div>
+                <h1 class="font-heading text-2xl md:text-3xl leading-tight tracking-tight uppercase" id="profile-tagline">Voz cargada</h1>
+                <p class="text-sm text-on-surface-variant max-w-3xl" id="profile-summary"></p>
+                <div class="flex flex-wrap gap-1.5 pt-1" id="profile-traits"></div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <button id="open-save" class="hero-gradient text-on-primary px-5 py-2.5 rounded-lg text-[11px] uppercase tracking-widest font-bold whitespace-nowrap">
+                    Guardar profile
+                </button>
+                <button id="view-profile" class="bg-white border border-outline-variant text-on-surface-variant px-5 py-2 rounded-lg text-[11px] uppercase tracking-widest font-bold hover:border-primary transition whitespace-nowrap">
+                    Ver detalles
+                </button>
+            </div>
+        </div>
+
+        <!-- Workspace -->
+        <div class="grid lg:grid-cols-2 gap-5">
+            <!-- Input -->
+            <div class="bg-white border border-outline-variant rounded-2xl p-5 md:p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-[0.25em] text-on-surface-variant">Input</div>
+                        <h2 class="font-heading text-2xl tracking-tight uppercase">Texto AI</h2>
+                    </div>
+                    <button id="paste-example" class="text-[10px] uppercase tracking-widest font-bold text-primary hover:underline">
+                        Cargar ejemplo
+                    </button>
+                </div>
+                <textarea id="input-text" rows="14" placeholder="Pega aquí cualquier texto generado por AI (ChatGPT, Claude, Gemini, etc.). Eco lo reescribe con tu voz."
+                    class="w-full bg-surface border border-outline-variant/60 rounded-xl px-4 py-3 text-sm focus:border-primary focus:bg-white focus:outline-none transition resize-none"></textarea>
+                <div class="flex items-center gap-3 pt-1">
+                    <button id="humanize-btn" class="hero-gradient text-on-primary px-6 py-3 rounded-lg font-bold uppercase tracking-[0.2em] text-xs hover:scale-[1.02] transition flex-1 disabled:opacity-50">
+                        Aplicar mi voz →
+                    </button>
+                    <button id="clear-input" class="text-xs text-on-surface-variant hover:text-primary transition px-3 py-3" title="Limpiar">Limpiar</button>
+                </div>
+                <div class="text-[11px] text-on-surface-variant/60">
+                    <span id="char-count">0</span> caracteres · ~<span id="token-est">0</span> palabras
+                </div>
+            </div>
+
+            <!-- Output -->
+            <div class="bg-white border-2 border-primary/30 rounded-2xl p-5 md:p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Output · Tu voz</div>
+                        <h2 class="font-heading text-2xl tracking-tight uppercase hero-text-gradient">Reescrito</h2>
+                    </div>
+                    <div id="output-meta" class="text-[10px] text-on-surface-variant font-mono hidden">·</div>
+                </div>
+
+                <div id="output-empty" class="bg-primary-fixed/30 border border-primary/15 rounded-xl px-4 py-12 text-center">
+                    <div class="text-sm text-on-surface-variant">El output aparecerá aquí.</div>
+                    <div class="text-[11px] text-on-surface-variant/60 mt-1">Pega texto y pulsa "Aplicar mi voz".</div>
+                </div>
+
+                <div id="output-loading" class="hidden bg-primary-fixed/30 border border-primary/15 rounded-xl px-4 py-10 text-center space-y-3">
+                    <div class="flex items-end h-8 justify-center gap-1">
+                        <span class="voice-bar" style="background: #0056c6"></span>
+                        <span class="voice-bar" style="background: #0056c6"></span>
+                        <span class="voice-bar" style="background: #0056c6"></span>
+                        <span class="voice-bar" style="background: #0056c6"></span>
+                        <span class="voice-bar" style="background: #0056c6"></span>
+                    </div>
+                    <div class="text-xs text-primary font-bold uppercase tracking-widest">Aplicando tu voz...</div>
+                </div>
+
+                <div id="output-result" class="hidden">
+                    <div id="output-text" class="bg-primary-fixed/40 border border-primary/15 rounded-xl px-4 py-4 text-sm leading-relaxed whitespace-pre-wrap"></div>
+                </div>
+
+                <div id="output-actions" class="hidden flex flex-wrap gap-2 pt-1">
+                    <button id="copy-btn" class="bg-white border border-outline-variant text-on-surface px-4 py-2 rounded-lg text-[11px] uppercase tracking-widest font-bold hover:border-primary transition">
+                        Copiar
+                    </button>
+                    <button id="regenerate-btn" class="bg-white border border-outline-variant text-on-surface px-4 py-2 rounded-lg text-[11px] uppercase tracking-widest font-bold hover:border-primary transition">
+                        Regenerar
+                    </button>
+                    <button id="more-casual-btn" class="bg-white border border-outline-variant text-on-surface px-4 py-2 rounded-lg text-[11px] uppercase tracking-widest font-bold hover:border-primary transition">
+                        Más casual
+                    </button>
+                    <button id="more-formal-btn" class="bg-white border border-outline-variant text-on-surface px-4 py-2 rounded-lg text-[11px] uppercase tracking-widest font-bold hover:border-primary transition">
+                        Más formal
+                    </button>
+                    <button id="shorter-btn" class="bg-white border border-outline-variant text-on-surface px-4 py-2 rounded-lg text-[11px] uppercase tracking-widest font-bold hover:border-primary transition">
+                        Más corto
+                    </button>
+                </div>
+
+                <div id="output-error" class="hidden bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700"></div>
+            </div>
+        </div>
+
+        <!-- Validation feedback -->
+        <div id="feedback-bar" class="hidden bg-white border border-outline-variant rounded-2xl p-5 flex flex-col md:flex-row md:items-center gap-3">
+            <div class="flex-1 text-sm">
+                <span class="font-bold">¿Qué tal el resultado?</span>
+                <span class="text-on-surface-variant"> Tu rating ayuda a entrenar tu profile.</span>
+            </div>
+            <div class="flex gap-2" id="rating-buttons">
+                <button data-rating="1" class="px-3 py-2 rounded-lg border border-outline-variant text-sm hover:border-primary transition">😐 Nada</button>
+                <button data-rating="2" class="px-3 py-2 rounded-lg border border-outline-variant text-sm hover:border-primary transition">🤔 Más o menos</button>
+                <button data-rating="3" class="px-3 py-2 rounded-lg border border-outline-variant text-sm hover:border-primary transition">👍 Bastante</button>
+                <button data-rating="4" class="px-3 py-2 rounded-lg border border-outline-variant text-sm hover:border-primary transition">✨ Idéntico</button>
+            </div>
+        </div>
+
+        <!-- Save profile modal trigger CTA -->
+        <div class="bg-gradient-to-br from-primary-fixed/40 to-white border border-primary/15 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-5">
+            <div class="flex-1 space-y-2">
+                <div class="font-heading text-2xl tracking-tight uppercase">Guarda tu voz</div>
+                <p class="text-sm text-on-surface-variant">Si Eco te late y quieres seguirlo usando — guarda tu profile con tu email. Te avisamos cuando salga la versión beta abierta.</p>
+            </div>
+            <button id="open-save-cta" class="hero-gradient text-on-primary px-6 py-3 rounded-lg text-xs uppercase tracking-widest font-bold whitespace-nowrap">
+                Guardar con email
+            </button>
+        </div>
+
+    </div>
+</main>
+
+<!-- Save Modal -->
+<div id="save-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-7 space-y-5 relative">
+        <button id="close-save" class="absolute top-3 right-4 text-on-surface-variant hover:text-on-surface text-2xl leading-none">×</button>
+        <div>
+            <h3 class="font-heading text-3xl tracking-tight uppercase">Guarda tu profile</h3>
+            <p class="text-sm text-on-surface-variant mt-2">Te enviamos un link para volver a tu profile cuando quieras + acceso temprano a la beta.</p>
+        </div>
+        <form id="save-form" class="space-y-4">
+            <input type="email" id="save-email" required placeholder="tu@email.com"
+                class="w-full bg-surface border border-outline-variant/60 rounded-xl px-4 py-3 text-sm focus:border-primary focus:bg-white focus:outline-none transition" />
+            <div class="space-y-2">
+                <label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">¿Pagarías por Eco?</label>
+                <div class="grid grid-cols-2 gap-2" id="willingness-group">
+                    <button type="button" data-w="no" class="border border-outline-variant rounded-lg px-3 py-2 text-xs font-bold hover:border-primary transition">Probablemente no</button>
+                    <button type="button" data-w="maybe" class="border border-outline-variant rounded-lg px-3 py-2 text-xs font-bold hover:border-primary transition">Tal vez</button>
+                    <button type="button" data-w="9" class="border border-outline-variant rounded-lg px-3 py-2 text-xs font-bold hover:border-primary transition">Sí, hasta $9/mes</button>
+                    <button type="button" data-w="19" class="border border-outline-variant rounded-lg px-3 py-2 text-xs font-bold hover:border-primary transition">Sí, hasta $19+/mes</button>
+                </div>
+            </div>
+            <button type="submit" id="save-submit" class="w-full hero-gradient text-on-primary px-6 py-3 rounded-lg font-bold uppercase tracking-[0.2em] text-xs hover:scale-[1.01] transition disabled:opacity-50">
+                Guardar
+            </button>
+            <p class="text-[10px] text-on-surface-variant/60 text-center">Solo te escribimos sobre Eco. Sin spam.</p>
+        </form>
+        <div id="save-success" class="hidden text-center space-y-3 py-6">
+            <div class="font-heading text-2xl tracking-tight uppercase">Guardado ✓</div>
+            <p class="text-sm text-on-surface-variant">Tu profile está a salvo. Te escribimos cuando salga la beta abierta.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Profile detail modal -->
+<div id="detail-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-7 space-y-4 relative max-h-[80vh] overflow-y-auto">
+        <button id="close-detail" class="absolute top-3 right-4 text-on-surface-variant hover:text-on-surface text-2xl leading-none">×</button>
+        <h3 class="font-heading text-2xl tracking-tight uppercase">Voice profile</h3>
+        <pre id="detail-json" class="bg-surface border border-outline-variant/60 rounded-xl p-4 text-[11px] overflow-auto leading-relaxed font-mono whitespace-pre-wrap"></pre>
+    </div>
+</div>
+
+<script>
+    const stored = localStorage.getItem('eco_active_profile');
+    const empty = document.getElementById('empty-state');
+    const app = document.getElementById('app');
+
+    if (!stored) {
+        empty.classList.remove('hidden');
+    } else {
+        const profile = JSON.parse(stored);
+        app.classList.remove('hidden');
+
+        // Header
+        document.getElementById('profile-id').textContent = `id: ${profile.id.slice(0, 12)}`;
+        document.getElementById('profile-tagline').textContent = profile.profile?.tagline || `Voz para ${profile.answers?.brand || 'tu marca'}`;
+        document.getElementById('profile-summary').textContent = profile.summary || 'Voice profile activo.';
+
+        const traits = profile.profile?.traits || [];
+        const traitsEl = document.getElementById('profile-traits');
+        traits.slice(0, 8).forEach(t => {
+            const el = document.createElement('span');
+            el.className = 'trait-chip';
+            el.textContent = t;
+            traitsEl.appendChild(el);
+        });
+
+        document.getElementById('detail-json').textContent = JSON.stringify(profile.profile, null, 2);
+
+        // Inputs
+        const inputText = document.getElementById('input-text');
+        const charCount = document.getElementById('char-count');
+        const tokenEst = document.getElementById('token-est');
+        inputText.addEventListener('input', () => {
+            charCount.textContent = inputText.value.length;
+            tokenEst.textContent = inputText.value.trim().split(/\s+/).filter(Boolean).length;
+        });
+
+        document.getElementById('clear-input').addEventListener('click', () => {
+            inputText.value = '';
+            charCount.textContent = '0';
+            tokenEst.textContent = '0';
+            hideOutput();
+        });
+
+        document.getElementById('paste-example').addEventListener('click', () => {
+            inputText.value = `En el competitivo panorama empresarial actual, es fundamental implementar estrategias innovadoras que potencien la productividad. Las organizaciones modernas deben aprovechar la inteligencia artificial para optimizar sus procesos y maximizar el retorno de inversión. Es importante destacar que la transformación digital no es una opción, sino una necesidad imperativa para mantenerse competitivo en el mercado actual.`;
+            charCount.textContent = inputText.value.length;
+            tokenEst.textContent = inputText.value.trim().split(/\s+/).filter(Boolean).length;
+        });
+
+        // Output state
+        const outputEmpty = document.getElementById('output-empty');
+        const outputLoading = document.getElementById('output-loading');
+        const outputResult = document.getElementById('output-result');
+        const outputText = document.getElementById('output-text');
+        const outputActions = document.getElementById('output-actions');
+        const outputError = document.getElementById('output-error');
+        const outputMeta = document.getElementById('output-meta');
+        const feedbackBar = document.getElementById('feedback-bar');
+
+        let lastResult = null;
+
+        function showLoading() {
+            outputEmpty.classList.add('hidden');
+            outputResult.classList.add('hidden');
+            outputActions.classList.add('hidden');
+            outputError.classList.add('hidden');
+            outputLoading.classList.remove('hidden');
+            outputMeta.classList.add('hidden');
+        }
+
+        function hideOutput() {
+            outputEmpty.classList.remove('hidden');
+            outputResult.classList.add('hidden');
+            outputActions.classList.add('hidden');
+            outputError.classList.add('hidden');
+            outputLoading.classList.add('hidden');
+            outputMeta.classList.add('hidden');
+            feedbackBar.classList.add('hidden');
+        }
+
+        function showResult(text, meta = null) {
+            outputEmpty.classList.add('hidden');
+            outputLoading.classList.add('hidden');
+            outputError.classList.add('hidden');
+            outputResult.classList.remove('hidden');
+            outputActions.classList.remove('hidden');
+            outputText.textContent = text;
+            if (meta) {
+                outputMeta.textContent = meta;
+                outputMeta.classList.remove('hidden');
+            }
+            feedbackBar.classList.remove('hidden');
+        }
+
+        function showError(msg) {
+            outputLoading.classList.add('hidden');
+            outputError.classList.remove('hidden');
+            outputError.textContent = msg;
+        }
+
+        async function callHumanize(directive = null) {
+            const text = inputText.value.trim();
+            if (!text || text.length < 20) {
+                alert('Pega al menos un párrafo (20+ caracteres).');
+                return;
+            }
+            showLoading();
+
+            try {
+                const res = await fetch('/api/eco-humanize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text,
+                        profile: profile.profile,
+                        answers: profile.answers,
+                        directive,
+                        profileId: profile.id,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Falló la generación');
+
+                lastResult = { input: text, output: data.text, directive };
+                const meta = data.tokensUsed ? `${data.tokensUsed} tokens` : null;
+                showResult(data.text, meta);
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        document.getElementById('humanize-btn').addEventListener('click', () => callHumanize());
+        document.getElementById('regenerate-btn').addEventListener('click', () => callHumanize('regenerate'));
+        document.getElementById('more-casual-btn').addEventListener('click', () => callHumanize('more_casual'));
+        document.getElementById('more-formal-btn').addEventListener('click', () => callHumanize('more_formal'));
+        document.getElementById('shorter-btn').addEventListener('click', () => callHumanize('shorter'));
+
+        document.getElementById('copy-btn').addEventListener('click', async () => {
+            await navigator.clipboard.writeText(outputText.textContent);
+            const btn = document.getElementById('copy-btn');
+            const original = btn.textContent;
+            btn.textContent = 'Copiado ✓';
+            setTimeout(() => { btn.textContent = original; }, 1500);
+        });
+
+        // Rating
+        document.getElementById('rating-buttons').addEventListener('click', async (e) => {
+            const btn = e.target.closest('[data-rating]');
+            if (!btn) return;
+            const rating = parseInt(btn.dataset.rating);
+            // Visual feedback
+            document.querySelectorAll('#rating-buttons button').forEach(b => b.classList.remove('border-primary', 'bg-primary-fixed'));
+            btn.classList.add('border-primary', 'bg-primary-fixed');
+            // Fire-and-forget log
+            try {
+                await fetch('/api/eco-save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        kind: 'rating',
+                        profileId: profile.id,
+                        rating,
+                        result: lastResult,
+                    }),
+                });
+            } catch (e) { /* silent */ }
+        });
+
+        // Reset
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            if (confirm('¿Borrar tu profile actual y empezar de nuevo?')) {
+                localStorage.removeItem('eco_active_profile');
+                window.location.href = '/eco/builder';
+            }
+        });
+
+        // Detail modal
+        const detailModal = document.getElementById('detail-modal');
+        document.getElementById('view-profile').addEventListener('click', () => detailModal.classList.remove('hidden'));
+        document.getElementById('close-detail').addEventListener('click', () => detailModal.classList.add('hidden'));
+        detailModal.addEventListener('click', (e) => { if (e.target === detailModal) detailModal.classList.add('hidden'); });
+
+        // Save modal
+        const saveModal = document.getElementById('save-modal');
+        const openSave = () => saveModal.classList.remove('hidden');
+        document.getElementById('open-save').addEventListener('click', openSave);
+        document.getElementById('open-save-cta').addEventListener('click', openSave);
+        document.getElementById('close-save').addEventListener('click', () => saveModal.classList.add('hidden'));
+        saveModal.addEventListener('click', (e) => { if (e.target === saveModal) saveModal.classList.add('hidden'); });
+
+        let willingness = null;
+        document.getElementById('willingness-group').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-w]');
+            if (!btn) return;
+            willingness = btn.dataset.w;
+            document.querySelectorAll('#willingness-group button').forEach(b => b.classList.remove('border-primary', 'bg-primary-fixed'));
+            btn.classList.add('border-primary', 'bg-primary-fixed');
+        });
+
+        document.getElementById('save-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submit = document.getElementById('save-submit');
+            const email = document.getElementById('save-email').value.trim();
+            submit.disabled = true;
+            submit.textContent = 'Guardando...';
+            try {
+                await fetch('/api/eco-save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        kind: 'save',
+                        profileId: profile.id,
+                        email,
+                        willingness,
+                        profile: profile.profile,
+                        answers: profile.answers,
+                        summary: profile.summary,
+                    }),
+                });
+                document.getElementById('save-form').classList.add('hidden');
+                document.getElementById('save-success').classList.remove('hidden');
+            } catch (err) {
+                submit.disabled = false;
+                submit.textContent = 'Guardar';
+                alert('No pudimos guardar. Intenta otra vez.');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
