@@ -290,47 +290,52 @@
     const QUESTIONS = {
         es: [
             { id: 'T1', text: '¿A qué te dedicas?' },
-            { id: 'T2', text: '¿Quién es la persona ideal a la que tú quieres escribirle? Descríbela.' },
-            { id: 'T3', text: 'Cuéntame de algo reciente — un proyecto, un cliente, un momento de trabajo que te marcó. Lo que pasó, lo que aprendiste.' },
+            { id: 'T2', text: 'Imagina que un cliente potencial te escribe: "Hola, ¿me cuentas más?". ¿Qué le respondes?' },
+            { id: 'T3', text: 'Cuéntame de algo de trabajo reciente que te hizo decir "esto es brutal" o "esto es un desastre". Sin filtro.' },
             { id: 'T4', text: 'En una línea, sin sonar a vendedor — ¿por qué importa lo que tú haces?' },
-            { id: 'T5', text: 'Última: ¿qué te da CRINGE cuando lees algo escrito por AI? Frases, palabras, tics. Sin filtrar.' },
+            { id: 'T5', text: '¿Qué frases te dan CRINGE cuando lees algo escrito por AI? Agarra una y reescríbela como TÚ la escribirías.' },
+            { id: 'T6', text: 'Última: imagina un post tuyo sobre algo que te apasiona. ¿Cómo lo abres? ¿Cómo lo cierras? Dame las dos líneas.' },
         ],
         spanglish: [
             { id: 'T1', text: '¿A qué te dedicas?' },
-            { id: 'T2', text: '¿Quién es la persona ideal a la que le quieres escribir? Describe her/him.' },
-            { id: 'T3', text: 'Cuéntame de algo reciente — un proyecto, un cliente, un momento de trabajo que te marcó. What happened, what you learned.' },
+            { id: 'T2', text: 'Imagina que un potential client te escribe: "Hola, ¿me cuentas más?". ¿Qué le respondes?' },
+            { id: 'T3', text: 'Cuéntame de algo de trabajo reciente que te hizo decir "esto es brutal" o "esto es un desastre". Sin filter.' },
             { id: 'T4', text: 'En una línea, sin sonar salesy — why does what you do matter?' },
-            { id: 'T5', text: 'Última: ¿qué te da CRINGE cuando lees AI-generated content? Frases, palabras, tics. Sin filtrar.' },
+            { id: 'T5', text: '¿Qué frases te dan CRINGE cuando lees AI text? Agarra una y reescríbela like YOU would write it.' },
+            { id: 'T6', text: 'Última: imagina un post tuyo sobre algo que te apasiona. How do you open it? How do you close it? Dame las dos líneas.' },
         ],
         en: [
             { id: 'T1', text: 'What do you do?' },
-            { id: 'T2', text: 'Who\'s the ideal person you want to write to? Describe them.' },
-            { id: 'T3', text: 'Tell me about something recent — a project, a client, a work moment that stuck with you. What happened, what you took from it.' },
+            { id: 'T2', text: 'Imagine a potential client messages you: "Hey, can you tell me more?". What do you reply?' },
+            { id: 'T3', text: 'Tell me about something at work recently that made you say "this is amazing" or "this is a disaster". Unfiltered.' },
             { id: 'T4', text: 'In one line, without sounding like a salesperson — why does your work matter?' },
-            { id: 'T5', text: 'Last one: what gives you CRINGE when you read AI-generated content? Phrases, words, tics. Unfiltered.' },
+            { id: 'T5', text: 'What phrases give you CRINGE when you read AI-written content? Grab one and rewrite it the way YOU would write it.' },
+            { id: 'T6', text: 'Last: imagine a post of yours about something you care about. How do you open it? How do you close it? Give me both lines.' },
         ],
         pt: [
             { id: 'T1', text: 'Com o que você trabalha?' },
-            { id: 'T2', text: 'Quem é a pessoa ideal pra quem você quer escrever? Me descreve.' },
-            { id: 'T3', text: 'Me conta de algo recente — um projeto, um cliente, um momento de trabalho que te marcou. O que aconteceu, o que você aprendeu.' },
+            { id: 'T2', text: 'Imagina que um cliente em potencial te escreve: "Oi, pode me contar mais?". O que você responde?' },
+            { id: 'T3', text: 'Me conta de algo recente no trabalho que te fez dizer "isso é incrível" ou "isso é um desastre". Sem filtro.' },
             { id: 'T4', text: 'Em uma linha, sem soar como vendedor — por que importa o que você faz?' },
-            { id: 'T5', text: 'Última: o que te dá CRINGE quando você lê conteúdo de AI? Frases, palavras, tiques. Sem filtro.' },
+            { id: 'T5', text: 'Que frases te dão CRINGE quando você lê conteúdo de AI? Pega uma e reescreve do jeito que VOCÊ escreveria.' },
+            { id: 'T6', text: 'Última: imagina um post seu sobre algo que te apaixona. Como você abre? Como você fecha? Me dá as duas linhas.' },
         ],
         other: [
             { id: 'T1', text: 'What do you do?' },
-            { id: 'T2', text: 'Who\'s the ideal person you want to write to? Describe them.' },
-            { id: 'T3', text: 'Tell me about something recent — a project, a client, a moment that marked you.' },
+            { id: 'T2', text: 'Imagine a potential client messages you: "Hey, can you tell me more?". What do you reply?' },
+            { id: 'T3', text: 'Tell me about something recent at work that made you say "this is great" or "this is a disaster". Unfiltered.' },
             { id: 'T4', text: 'In one line, without sounding salesy — why does your work matter?' },
-            { id: 'T5', text: 'Last: what gives you CRINGE when you read AI text? Phrases, words, tics. Unfiltered.' },
+            { id: 'T5', text: 'What phrases give you CRINGE when you read AI text? Grab one and rewrite it the way YOU would write it.' },
+            { id: 'T6', text: 'Last: imagine a post of yours about something you care about. How do you open it? How do you close it? Give me both.' },
         ],
     };
 
     const INTROS = {
-        es: 'OK. Te voy a hacer 5 preguntas cortas. Cómo respondes importa más que qué — escribe como escribes en serio.',
-        spanglish: 'OK. Te voy a hacer 5 quick questions. How you answer matters más que qué — escribe como escribes for real.',
-        en: 'OK. I\'ll ask you 5 short questions. How you answer matters more than what — write the way you actually write.',
-        pt: 'OK. Vou fazer 5 perguntas curtas. Como você responde importa mais que o quê — escreva como você realmente escreve.',
-        other: 'OK. I\'ll ask 5 short questions. How you answer matters more than what — write naturally.',
+        es: 'OK. Te voy a hacer 6 preguntas cortas. Cómo respondes importa más que qué — escribe como escribes en serio, sin pulir.',
+        spanglish: 'OK. Te voy a hacer 6 quick questions. How you answer matters más que qué — escribe como escribes for real, sin pulir.',
+        en: 'OK. I\'ll ask you 6 short questions. How you answer matters more than what — write the way you actually write, no polishing.',
+        pt: 'OK. Vou fazer 6 perguntas curtas. Como você responde importa mais que o quê — escreva como você realmente escreve, sem polir.',
+        other: 'OK. I\'ll ask 6 short questions. How you answer matters more than what — write naturally, no polishing.',
     };
 
     const WELCOMES = {
@@ -521,20 +526,20 @@
     }
 
     function updateProgress() {
-        const totalSteps = 6; // 5 questions + traits
-        let step = Math.min(state.currentQ, 5);
-        if (state.status === 'context' || state.status === 'generating' || state.status === 'done') step = 6;
+        const totalSteps = 7; // 6 questions + traits review
+        let step = Math.min(state.currentQ, 6);
+        if (state.status === 'context' || state.status === 'generating' || state.status === 'done') step = 7;
         const pct = Math.round((step / totalSteps) * 100);
         progressFill.style.width = pct + '%';
 
         if (!state.lang) {
             progressText.textContent = 'Empieza';
-        } else if (step <= 4) {
+        } else if (step <= 5) {
             const labels = {
                 es: 'Pregunta', spanglish: 'Pregunta', en: 'Question', pt: 'Pergunta', other: 'Question',
             };
-            progressText.textContent = `${labels[state.lang]} ${step + 1} / 5`;
-        } else if (step === 5) {
+            progressText.textContent = `${labels[state.lang]} ${step + 1} / 6`;
+        } else if (step === 6) {
             progressText.textContent = state.lang === 'en' ? 'Reviewing voice' : 'Revisando voz';
         } else {
             progressText.textContent = state.lang === 'en' ? 'Final step' : 'Paso final';
@@ -1009,7 +1014,6 @@
                     mode: 'conversation',
                     lang: state.lang,
                     brand: extractAnswer('T1'),
-                    audience: extractAnswer('T2'),
                     confirmedTraits: Array.from(state.confirmedTraits),
                 },
                 samplesCount: state.contextSamples.length,

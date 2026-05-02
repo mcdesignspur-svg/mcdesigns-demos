@@ -64,17 +64,25 @@ Hard rules:
 - The user's CONVERSATION ANSWERS are themselves writing samples — mine them aggressively for cadence, vocabulary, signature phrases, openers, connectors. They wrote those answers in their natural voice.
 - If extra samples are provided, weight them equally with conversation answers.
 - Anti-patterns must be CONCRETE. "Avoid corporate jargon" is weak. List specific words: "potenciar", "empoderar", "leverage", "synergy", "in today's world", "it's important to note".
-- The user's "cringe" answer (last conversation question) is gold for anti_patterns — pull from it directly.
 - Confirmed trait chips are user-validated truths; reflect them in the profile. Rejected chips are wrong; do NOT include those in traits/tone.
 - Keep all string values in the same primary language as the user's writing.
-- Return ONLY the JSON object. Nothing else.`;
+- Return ONLY the JSON object. Nothing else.
+
+TURN-SPECIFIC MINING RULES (each conversation turn is engineered to surface specific dimensions — mine accordingly):
+- T1 (what they do): vocabulary baseline, default formality, brevity tendency. A short answer here is a signal — they're concise by default.
+- T2 (reply to a prospect DM): this is a PITCH-VOICE SAMPLE. Extract opener_pattern when writing to strangers, helper persona, persona (yo/tu/usted), how they describe their work in pitch context. Weight this turn heavily for opener_pattern when register is professional-stranger.
+- T3 (emotional moment, "brutal" or "disaster"): EMOTIONAL STORYTELLING SAMPLE. Mine for narrative rhythm, conviction calibration, humor style, emotional default, how they characterize people and tense situations. This is where humor and conviction surface most clearly.
+- T4 (one-line claim, no selling): claim-making style. Are they hedged or absolute? Do they make sweeping or narrow claims? Use this for the conviction posture in tone.dominant.
+- T5 (cringe + rewrite): TWO-PART GOLD. (a) The listed cringe phrases go DIRECTLY into lexicon.anti_patterns and do_not_rules — quote them verbatim. (b) The user's rewrite of one cringe phrase IS a direct voice sample showing their voice in action — mine its phrasing and shape for signature_phrases and rhythm rules.
+- T6 (post opener + closer): HIGHEST-LEVERAGE SAMPLES for the rewriter. The opener line goes into structure.opener_pattern as a near-verbatim template. The closer line goes into structure.closer_pattern. These two patterns are what the rewriter needs most.`;
 
 const QUESTION_PURPOSE = {
-    T1: 'What they do / their work / value proposition (any kind: business, project, content, profession)',
-    T2: 'Their ideal audience / who they write to',
-    T3: 'A recent project or moment that marked them',
-    T4: 'In one line, why their work matters (without selling)',
-    T5: 'What gives them cringe in AI-generated content',
+    T1: 'What they do — vocabulary base, default formality, brevity',
+    T2: 'PITCH SAMPLE — reply to a prospect DM. Extract opener with strangers, helper voice, pitch register',
+    T3: 'EMOTIONAL STORY — recent moment with explicit positive/negative valence. Extract narrative rhythm, conviction, humor, emotional default',
+    T4: 'ONE-LINE CLAIM — why work matters without selling. Extract claim-making style, conviction calibration',
+    T5: 'CRINGE + REWRITE — listed anti-patterns AND a direct voice sample showing how they would write it',
+    T6: 'OPENER + CLOSER SAMPLES — actual content opener and closer the user wrote. Highest-priority signal for the rewriter',
 };
 
 export default async function handler(req, res) {
@@ -145,11 +153,12 @@ Output the JSON profile now.`;
         answersForStorage = {
             mode: 'conversation',
             lang,
-            brand: extractFirstAnswer(transcript, 'T1'),
-            audience: extractFirstAnswer(transcript, 'T2'),
+            brand: extractFirstAnswer(transcript, 'T1'), // what they do
+            pitch_sample: extractFirstAnswer(transcript, 'T2'),
             story: extractFirstAnswer(transcript, 'T3'),
             why: extractFirstAnswer(transcript, 'T4'),
-            cringe: extractFirstAnswer(transcript, 'T5'),
+            cringe_and_rewrite: extractFirstAnswer(transcript, 'T5'),
+            post_opener_closer: extractFirstAnswer(transcript, 'T6'),
             confirmedTraits,
             rejectedTraits,
         };
