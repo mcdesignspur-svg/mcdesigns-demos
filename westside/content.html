@@ -152,12 +152,22 @@
                     <textarea id="topic" rows="3" placeholder="Ej: lunes de piernas — por qué no puedes skipear leg day"
                         class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:border-brand focus:outline-none transition resize-none"></textarea>
 
-                    <!-- Preset examples -->
+                    <!-- Preset examples (live API) -->
                     <div class="flex flex-wrap gap-2 mt-3">
                         <button type="button" data-preset="lunes de piernas — por qué no puedes skipear leg day" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Leg day</button>
                         <button type="button" data-preset="María bajó 22 libras en 3 meses entrenando 4 veces por semana" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Testimonio</button>
                         <button type="button" data-preset="Free trial de 7 días gratis — empieza esta semana" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Free trial</button>
                         <button type="button" data-preset="3 errores comunes haciendo sentadilla que sabotean tus gainz" class="preset-btn text-[10px] uppercase tracking-wider border border-white/15 hover:border-brand hover:text-brand px-3 py-1.5 rounded-full transition">Form tips</button>
+                    </div>
+
+                    <!-- Curated demo outputs (instant render, no API) -->
+                    <div class="mt-4 pt-4 border-t border-accent/20">
+                        <div class="text-[10px] uppercase tracking-widest text-accent/90 mb-2 font-bold">⚡ Demos curated · render instantáneo</div>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" data-demo="madres" data-preset="Día de las Madres — homenaje a mamás que entrenan" class="preset-btn text-[10px] uppercase tracking-wider border border-accent/40 bg-accent/5 hover:bg-accent/15 hover:text-accent px-3 py-1.5 rounded-full transition">Día Madres</button>
+                            <button type="button" data-demo="memorial" data-preset="Memorial Day — promo arranque de verano" class="preset-btn text-[10px] uppercase tracking-wider border border-accent/40 bg-accent/5 hover:bg-accent/15 hover:text-accent px-3 py-1.5 rounded-full transition">Memorial Day</button>
+                            <button type="button" data-demo="transformacion" data-preset="Transformación 6 meses — Carlos bajó 38 lbs entrenando 4x/semana" class="preset-btn text-[10px] uppercase tracking-wider border border-accent/40 bg-accent/5 hover:bg-accent/15 hover:text-accent px-3 py-1.5 rounded-full transition">Transformación</button>
+                        </div>
                     </div>
                 </div>
 
@@ -247,12 +257,140 @@
         });
     });
 
-    // Presets
+    // ============================================================
+    // PRELOADED OUTPUTS — curated content for live demo
+    // Renderiza al instante sin llamar al API. Garantiza que el demo
+    // funciona aunque el WiFi falle o el API esté lento.
+    // ============================================================
+    const PRELOADED_OUTPUTS = {
+        madres: {
+            state: { location: 'Caguas', postType: 'Motivación', format: 'Reel' },
+            output: {
+                hooks: [
+                    "Mami, esto va por ti.",
+                    "La mejor versión de mami no llegó después de los nenes. Llegó porque ella decidió.",
+                    "A mi mamá no le regalan flores este año. Le regalan 7 días de free trial."
+                ],
+                caption_short: "Mami, esto es por ti. 🌷 Por las mañanas que arrancas antes que todos, los días que no te tocan, las veces que decidiste cuidarte de nuevo. Este Día de las Madres, regálate los 7 días que cambian todo. Comenta MADRE pa' los detalles. 💪",
+                caption_medium: "Mami, esto va por ti. 🌷\n\nPor las mañanas que arrancas antes que todos. Los días que no te tocan. Las veces que volviste a empezar después de los nenes, después del trabajo, después de todo. WestSide es donde mami vuelve a sentirse mami — fuerte, presente, suya.\n\nEste Día de las Madres no le regales flores que se mueren en 3 días. Regálate (o regálale) 7 días de free trial en cualquiera de nuestras 3 ubicaciones — Caguas, San Juan, Bayamón.\n\nComenta MADRE y te mando los detalles directo. 💪",
+                reel_script: {
+                    hook: { voiceover: "Mami, esto va por ti.", visual: "Close-up de mamá amarrándose tenis con su nene viéndola en el espejo" },
+                    beat_1: { voiceover: "Por las mañanas que arrancas antes que todos.", visual: "Cut a mamá levantando peso, focused, sweat real, sin maquillaje" },
+                    beat_2: { voiceover: "Por los días que decidiste volver.", visual: "Cut a mamá con grupo de mujeres en clase, sonriendo, energía colectiva" },
+                    beat_3: { voiceover: "WestSide. Donde mami vuelve a sentirse mami.", visual: "Logo WestSide con overlay de las 3 ubicaciones — Caguas / San Juan / Bayamón" },
+                    cta: { voiceover: "7 días gratis. Comenta MADRE pa' los detalles.", visual: "Card final con CTA grande: 'Comenta MADRE pa' tu free trial 7 días'" }
+                },
+                manychat: {
+                    keyword: "MADRE",
+                    trigger_line: "Comenta MADRE pa' los detalles · Te mando link directo de free trial 7 días en tu ubicación más cercana"
+                },
+                hashtags: ["#WestSideFitness", "#DiaDeLasMadres", "#MamasFitnessPR", "#PuertoRicoFit", "#CagusFitness", "#SanJuanFitness", "#BayamonFitness", "#FreeTrialPR", "#FitMom", "#EntrenaConWestSide"],
+                best_time: "Vie 8 mayo · 7:00 PM",
+                image_prompt: "Cinematic close-up shot of a Latina mother in her late 30s tying her sneakers in a modern gym, soft morning light coming through industrial windows. Her young son stands behind her watching with admiration. Authentic Puerto Rican aesthetic, no stock-photo feel, warm but determined expression. WestSide Fitness branded gym environment in background. Shallow depth of field, professional cinematography style."
+            }
+        },
+        memorial: {
+            state: { location: 'Caguas', postType: 'Promo', format: 'Reel' },
+            output: {
+                hooks: [
+                    "Tres meses pa' verano. Tú decides cómo llegas.",
+                    "Memorial Day weekend. La excusa pa' empezar mañana se acabó hoy.",
+                    "$29.99 al mes. 365 días al año. 0 contratos. Esa es la promo."
+                ],
+                caption_short: "Tres meses pa' verano. Tú decides cómo llegas. 🔥\n\nWestSide membership: $29.99/mo, sin contratos, todas las ubicaciones, todas las clases incluidas.\n\nComenta VERANO y te mando el link. 7 días gratis pa' arrancar.",
+                caption_medium: "Tres meses pa' verano. 🔥\n\nNo te voy a vender el cuento de que en 12 semanas vas a estar irreconocible. Pero sí te garantizo esto: si arrancas hoy, en 3 meses NO vas a estar igual que ayer.\n\nWestSide es:\n✅ $29.99/mo (no $49, no $69 — $29.99)\n✅ 3 ubicaciones — Caguas, San Juan, Bayamón\n✅ Todas las clases incluidas (spinning, crossfit, weights, cardio)\n✅ Sin contratos largos. Si no te gusta, te vas. Punto.\n\nMemorial Day weekend es tu excusa pa' arrancar. Comenta VERANO y te mando el link de free trial 7 días.",
+                reel_script: {
+                    hook: { voiceover: "Tres meses pa' verano.", visual: "Calendario fast-cut: mayo → junio → julio → agosto, con números grandes" },
+                    beat_1: { voiceover: "Tú decides cómo llegas.", visual: "Split screen: persona en sofá con celular vs persona entrenando con energía" },
+                    beat_2: { voiceover: "$29.99 al mes. 3 ubicaciones. Todas las clases incluidas.", visual: "B-roll energético: barbells, sled push, group class clapping, sweat shots" },
+                    beat_3: { voiceover: "Sin contratos. Sin sorpresas.", visual: "Logo WestSide con texto overlay 'Sin contratos · Sin sorpresas · Sin letra chica'" },
+                    cta: { voiceover: "Comenta VERANO pa' arrancar.", visual: "CTA card: 'Comenta VERANO pa' tu free trial 7 días' + ubicaciones" }
+                },
+                manychat: {
+                    keyword: "VERANO",
+                    trigger_line: "Comenta VERANO y te mando el link · Free trial 7 días en tu ubicación más cercana"
+                },
+                hashtags: ["#WestSideFitness", "#VeranoPR", "#MemorialDay", "#PuertoRicoFit", "#FitnessGoals", "#CagusGym", "#SanJuanGym", "#BayamonGym", "#FreeTrial7Dias", "#29MensualPR"],
+                best_time: "Vie 22 mayo · 5:30 PM",
+                image_prompt: "High-energy split-screen composition: left side shows person sitting on couch scrolling phone in dim light, right side shows the same person mid-workout in a vibrant WestSide Fitness gym pushing a sled with intensity. Strong contrast in lighting and energy. Bold red/yellow Puerto Rican fitness branding. Cinematic, motivational, no cheesy stock vibes. Aspect ratio 9:16 for Reels."
+            }
+        },
+        transformacion: {
+            state: { location: 'Caguas', postType: 'Testimonio', format: 'Reel' },
+            output: {
+                hooks: [
+                    "Hace 6 meses Carlos pesaba 245. Hoy te cuenta cómo bajó 38 sin pasar hambre.",
+                    "6 meses. Una rutina. Cero magia.",
+                    "Le pregunté qué fue lo que más cambió. La respuesta no fue el peso."
+                ],
+                caption_short: "6 meses. -38 lbs. Sin dieta extrema, sin pastillas, sin magia. Solo una rutina con la que pudo cumplir. La historia completa de Carlos en el Reel. ⬆️\n\nComenta RETO si quieres tu propio plan de 6 meses.",
+                caption_medium: "Le pregunté a Carlos qué fue lo que más cambió.\n\nPensé que iba a decir el peso (-38 lbs en 6 meses). O las pulgadas. O cómo le quedan los pantalones.\n\nMe dijo: \"Que ahora me levanto antes que mis nenes.\"\n\nEso. Eso es lo que mueve. No el número en la pesa — el hecho de que el primer paso del día ya no es excusa, es decisión.\n\nCarlos entrena en WestSide Caguas 4 días a la semana. Empezó con 7 días free trial en noviembre. La rutina la armamos juntos, simple, sostenible.\n\nSi quieres uno como el de Carlos, comenta RETO. Te armamos el tuyo. 💪",
+                reel_script: {
+                    hook: { voiceover: "Carlos: 'Pensé que lo más importante iba a ser el peso.'", visual: "Close-up de Carlos hablando a cámara, casual, gym de fondo, iluminación natural" },
+                    beat_1: { voiceover: "Carlos: 'Bajé 38 libras, sí — pero eso no fue lo que más cambió.'", visual: "B-roll Carlos entrenando, focus en cara y esfuerzo real, sweat, no posed" },
+                    beat_2: { voiceover: "Carlos: 'Lo que cambió fue que me levanto antes que mis nenes.'", visual: "Cut a Carlos saliendo de su casa temprano, abrazando a su hijo en la puerta" },
+                    beat_3: { voiceover: "(Música sube — sin VO)", visual: "Texto overlay grande: '6 meses · WestSide Caguas · Una rutina sostenible'" },
+                    cta: { voiceover: "Voz MC Designs: 'Comenta RETO. Armamos el tuyo.'", visual: "CTA card final: 'Comenta RETO pa' armar el tuyo' + logo WestSide" }
+                },
+                manychat: {
+                    keyword: "RETO",
+                    trigger_line: "Comenta RETO y armamos tu plan personalizado · Como el de Carlos, pero pa' ti"
+                },
+                hashtags: ["#WestSideFitness", "#TransformacionReal", "#PuertoRicoFit", "#CagusFitness", "#FitJourneyPR", "#RealResults", "#6MonthTransformation", "#FitnessMotivation", "#SinFiltros", "#WestSideStory"],
+                best_time: "Mar · 6:30 PM",
+                image_prompt: "Authentic documentary-style shot of a Puerto Rican man in his 40s, mid-conversation with the camera, sitting on a weight bench in a WestSide gym. Natural lighting, no makeup, real sweat from training. His expression is reflective, not posed. Warm color grading. Aspect ratio 9:16. The vibe should feel like a real testimonial, not a commercial."
+            }
+        }
+    };
+
+    function updateChips() {
+        document.querySelectorAll('[data-loc]').forEach(b => b.classList.toggle('active', b.dataset.loc === state.location));
+        document.querySelectorAll('[data-type]').forEach(b => b.classList.toggle('active', b.dataset.type === state.postType));
+        document.querySelectorAll('[data-format]').forEach(b => b.classList.toggle('active', b.dataset.format === state.format));
+    }
+
+    async function runDemoOutput(output) {
+        empty.classList.add('hidden');
+        result.classList.add('hidden');
+        errorBox.classList.add('hidden');
+        loading.classList.remove('hidden');
+        genBtn.disabled = true;
+        btnLabel.textContent = 'Generando...';
+        btnTime.textContent = '';
+
+        const started = Date.now();
+        const targetMs = 1300 + Math.floor(Math.random() * 700);
+        const timer = setInterval(() => {
+            btnTime.textContent = ((Date.now() - started) / 1000).toFixed(1) + 's';
+        }, 100);
+
+        await new Promise(r => setTimeout(r, targetMs));
+
+        clearInterval(timer);
+        const elapsed = Date.now() - started;
+        loading.classList.add('hidden');
+        result.classList.remove('hidden');
+        render(output, elapsed);
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        genBtn.disabled = false;
+        btnLabel.textContent = 'Generar Contenido';
+        btnTime.textContent = '';
+    }
+
+    // Presets — incluye los regulares (api real) + curated demos (preloaded instant)
     const topicEl = document.getElementById('topic');
     document.querySelectorAll('.preset-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             topicEl.value = btn.dataset.preset;
-            topicEl.focus();
+
+            if (btn.dataset.demo && PRELOADED_OUTPUTS[btn.dataset.demo]) {
+                const demo = PRELOADED_OUTPUTS[btn.dataset.demo];
+                Object.assign(state, demo.state);
+                updateChips();
+                runDemoOutput(demo.output);
+            } else {
+                topicEl.focus();
+            }
         });
     });
 

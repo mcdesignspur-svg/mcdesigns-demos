@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WestSide · ANTES vs DESPUÉS — Bot con Cerebro AI</title>
+<meta name="robots" content="noindex, nofollow"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Anton&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --ink:#0A0A0A;
+    --offblack:#121212;
+    --brand:#E63946;
+    --brandDark:#C41E2C;
+    --accent:#FFB800;
+    --cream:#F5F1E8;
+    --wa-bg:#0B141A;
+    --wa-header:#1F2C34;
+    --wa-out:#005C4B;
+    --wa-in:#202C33;
+    --wa-text:#E9EDEF;
+    --wa-meta:#8696A0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--ink);color:#fff;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;overflow-x:hidden}
+
+  /* Header */
+  .top{padding:32px 24px 24px;text-align:center;border-bottom:1px solid #1f1f1f;background:linear-gradient(180deg,#0a0a0a 0%,#121212 100%)}
+  .top .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .top .eyebrow::before{content:"";width:6px;height:6px;border-radius:999px;background:var(--accent);box-shadow:0 0 0 6px rgba(255,184,0,0.18)}
+  .top h1{font-family:'Anton',Impact,sans-serif;font-size:clamp(28px,5vw,52px);line-height:1;letter-spacing:0.01em;text-transform:uppercase;color:#fff}
+  .top h1 .red{color:var(--brand)}
+  .top p.lede{margin-top:14px;color:#bdbdbd;font-size:15px;max-width:760px;margin-left:auto;margin-right:auto;line-height:1.5}
+  .controls{margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:10px 18px;font-weight:700;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;border-radius:8px;border:1px solid #2a2a2a;background:#181818;color:#fff;cursor:pointer;transition:all .15s ease}
+  .btn:hover{background:#222;border-color:#3a3a3a}
+  .btn.primary{background:var(--brand);border-color:var(--brand)}
+  .btn.primary:hover{background:var(--brandDark);border-color:var(--brandDark)}
+
+  /* Stage */
+  .stage{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:40px 24px 60px;max-width:1400px;margin:0 auto;align-items:start}
+  @media (max-width:880px){.stage{grid-template-columns:1fr;gap:48px;padding:32px 16px}}
+
+  .col-label{margin-bottom:18px;text-align:center}
+  .col-label .tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+  .col-left .col-label .tag{background:rgba(230,57,70,0.14);color:#ff7a82;border:1px solid rgba(230,57,70,0.4)}
+  .col-right .col-label .tag{background:rgba(34,197,94,0.14);color:#5fe796;border:1px solid rgba(34,197,94,0.4)}
+  .col-label h2{font-family:'Anton',sans-serif;font-size:32px;text-transform:uppercase;margin-top:10px;letter-spacing:0.01em}
+  .col-label p{color:#9a9a9a;font-size:13px;margin-top:6px}
+
+  /* Phone frame */
+  .phone{width:100%;max-width:380px;margin:0 auto;background:#000;border-radius:42px;padding:14px;box-shadow:0 30px 60px -20px rgba(0,0,0,0.6),0 0 0 1px #1a1a1a;position:relative}
+  .phone::before{content:"";position:absolute;top:18px;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#000;border-radius:999px;z-index:3}
+  .phone-screen{background:var(--wa-bg);border-radius:30px;overflow:hidden;height:680px;display:flex;flex-direction:column;position:relative}
+
+  /* Phone status bar */
+  .statusbar{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 6px;color:#fff;font-size:13px;font-weight:600;background:var(--wa-header)}
+  .statusbar .right{display:flex;gap:6px;align-items:center}
+
+  /* WhatsApp header */
+  .wa-header{background:var(--wa-header);display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #0d1418}
+  .wa-back{color:#fff;font-size:22px;line-height:1;opacity:0.85}
+  .wa-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#E63946,#C41E2C);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:16px;color:#fff;letter-spacing:0.05em}
+  .wa-name{flex:1;display:flex;flex-direction:column;justify-content:center;line-height:1.15}
+  .wa-name .n{color:#E9EDEF;font-size:14px;font-weight:600}
+  .wa-name .s{color:#8696A0;font-size:11px;font-weight:400}
+  .wa-actions{display:flex;gap:18px;color:#aebac1;font-size:18px}
+
+  /* Chat body */
+  .chat{flex:1;overflow-y:auto;padding:14px 12px 60px;background:var(--wa-bg);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.012) 0,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 12px);scroll-behavior:smooth}
+  .chat::-webkit-scrollbar{width:0}
+
+  /* Date chip */
+  .datechip{display:flex;justify-content:center;margin:6px 0 14px}
+  .datechip span{background:#182229;color:#8696A0;font-size:11px;padding:4px 10px;border-radius:6px;font-weight:500}
+
+  /* Message bubble */
+  .msg{max-width:78%;padding:6px 8px 5px 10px;border-radius:8px;margin-bottom:4px;font-size:14px;line-height:1.35;color:var(--wa-text);position:relative;opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease;word-wrap:break-word}
+  .msg.show{opacity:1;transform:translateY(0)}
+  .msg.in{background:var(--wa-in);align-self:flex-start;margin-right:auto;border-top-left-radius:0}
+  .msg.out{background:var(--wa-out);align-self:flex-end;margin-left:auto;border-top-right-radius:0}
+  .msg .meta{display:flex;justify-content:flex-end;align-items:center;gap:4px;font-size:10px;color:var(--wa-meta);margin-top:2px}
+  .msg.out .meta .check{color:#53BDEB}
+  .msg .emoji{font-size:16px}
+
+  .msg-row{display:flex;flex-direction:column;width:100%}
+  .typing{display:none;align-items:center;gap:4px;background:var(--wa-in);padding:10px 14px;border-radius:8px;border-top-left-radius:0;width:fit-content;margin-bottom:6px}
+  .typing.show{display:flex}
+  .typing span{width:6px;height:6px;border-radius:999px;background:#8696A0;animation:bounce 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-4px);opacity:1}}
+
+  /* Input bar (fake) */
+  .wa-input{position:absolute;bottom:0;left:0;right:0;background:var(--wa-header);padding:8px 12px;display:flex;gap:8px;align-items:center;border-top:1px solid #0d1418}
+  .wa-input .field{flex:1;background:#2A3942;border-radius:999px;padding:8px 14px;color:#8696A0;font-size:13px}
+  .wa-input .send{width:38px;height:38px;border-radius:999px;background:#00A884;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+
+  /* Verdict footer */
+  .verdict{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1400px;margin:0 auto 60px;padding:0 24px}
+  @media (max-width:880px){.verdict{grid-template-columns:1fr;gap:14px;padding:0 16px}}
+  .verdict-card{padding:22px;border-radius:14px;border:1px solid #1f1f1f;background:#0f0f0f}
+  .verdict-card.bad{border-color:rgba(230,57,70,0.3)}
+  .verdict-card.good{border-color:rgba(34,197,94,0.3)}
+  .verdict-card h3{font-family:'Anton',sans-serif;font-size:22px;text-transform:uppercase;margin-bottom:12px;letter-spacing:0.01em}
+  .verdict-card.bad h3{color:#ff7a82}
+  .verdict-card.good h3{color:#5fe796}
+  .verdict-card ul{list-style:none}
+  .verdict-card li{padding:8px 0 8px 26px;position:relative;color:#bdbdbd;font-size:14px;line-height:1.45;border-bottom:1px solid #1a1a1a}
+  .verdict-card li:last-child{border-bottom:0}
+  .verdict-card li::before{position:absolute;left:0;top:7px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .verdict-card.bad li::before{content:"✕";background:rgba(230,57,70,0.15);color:#ff7a82}
+  .verdict-card.good li::before{content:"✓";background:rgba(34,197,94,0.15);color:#5fe796}
+
+  /* Bottom strip */
+  .strip{padding:48px 24px;text-align:center;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%);border-top:1px solid #1f1f1f}
+  .strip h2{font-family:'Anton',sans-serif;font-size:clamp(28px,4vw,44px);text-transform:uppercase;letter-spacing:0.01em;margin-bottom:14px}
+  .strip h2 .red{color:var(--brand)}
+  .strip p{color:#9a9a9a;font-size:15px;max-width:680px;margin:0 auto;line-height:1.6}
+  .strip .accent-line{display:inline-block;margin-top:22px;padding:10px 18px;background:rgba(255,184,0,0.1);border:1px solid rgba(255,184,0,0.3);color:var(--accent);font-size:13px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;border-radius:8px}
+
+  /* Print */
+  @media print{
+    body{background:#fff;color:#000}
+    .controls{display:none}
+    .top{padding:20px 0;background:none}
+    .stage{padding:20px;page-break-inside:avoid}
+    .phone{box-shadow:none;page-break-inside:avoid;max-width:300px}
+    .strip{display:none}
+    .msg{opacity:1!important;transform:none!important}
+    .typing{display:none!important}
+  }
+</style>
+</head>
+<body>
+
+<section class="top">
+  <div class="eyebrow">Demo Comparativo · WestSide Fitness</div>
+  <h1>El detalle <span class="red">minor</span> que vale el upgrade</h1>
+  <p class="lede">Mismo WhatsApp. Mismo número. Cerebro distinto. El bot actual te pide datos que ya tiene. El bot con cerebro AI reconoce al lead desde el primer mensaje.</p>
+  <div class="controls">
+    <button class="btn primary" id="play">▶ Reproducir comparación</button>
+    <button class="btn" id="reset">↻ Reiniciar</button>
+    <button class="btn" id="print">🖨 Imprimir</button>
+  </div>
+</section>
+
+<section class="stage">
+  <!-- LEFT: Bot actual -->
+  <div class="col-left">
+    <div class="col-label">
+      <span class="tag">⚠ Bot actual sin cerebro</span>
+      <h2>Antes</h2>
+      <p>Lead pierde paciencia. Vendedor no recibe nada útil.</p>
+    </div>
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="statusbar">
+          <span>9:47</span>
+          <span class="right">●●●● 5G ◼</span>
+        </div>
+        <div class="wa-header">
+          <span class="wa-back">‹</span>
+          <div class="wa-avatar">W</div>
+          <div class="wa-name"><span class="n">WestSide Fitness Caguas</span><span class="s">en línea</span></div>
+          <div class="wa-actions"><span>📹</span><span>📞</span></div>
+        </div>
+        <div class="chat" id="chat-left">
+          <div class="datechip"><span>HOY</span></div>
+          <div class="msg-row" id="left-msgs"></div>
+        </div>
+        <div class="wa-input">
+          <div class="field">Escribe un mensaje</div>
+          <div class="send">🎤</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Bot con cerebro -->
+  <div class="col-right">
+    <div class="col-label">
+      <span class="tag">✓ Bot con cerebro Claude</span>
+      <h2>Después</h2>
+      <p>Lead reconocido. Free trial agendado en 3 mensajes.</p>
+    </div>
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="statusbar">
+          <span>9:47</span>
+          <span class="right">●●●● 5G ◼</span>
+        </div>
+        <div class="wa-header">
+          <span class="wa-back">‹</span>
+          <div class="wa-avatar">W</div>
+          <div class="wa-name"><span class="n">WestSide Fitness Caguas</span><span class="s">en línea</span></div>
+          <div class="wa-actions"><span>📹</span><span>📞</span></div>
+        </div>
+        <div class="chat" id="chat-right">
+          <div class="datechip"><span>HOY</span></div>
+          <div class="msg-row" id="right-msgs"></div>
+        </div>
+        <div class="wa-input">
+          <div class="field">Escribe un mensaje</div>
+          <div class="send">🎤</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="verdict">
+  <div class="verdict-card bad">
+    <h3>Lo que pasa hoy</h3>
+    <ul>
+      <li>Bot pide nombre cuando ya está en su WhatsApp</li>
+      <li>Bot pide número de teléfono — visible en la conversación</li>
+      <li>Bot pide ubicación que el lead ya mencionó</li>
+      <li>Lead se frustra y abandona la conversación</li>
+      <li>Vendedor no recibe contexto, ni intent, ni próxima acción</li>
+      <li>10 mensajes después, María no sabe horarios de spinning</li>
+    </ul>
+  </div>
+  <div class="verdict-card good">
+    <h3>Lo que pasa con cerebro AI</h3>
+    <ul>
+      <li>Bot accede al número automáticamente vía system fields</li>
+      <li>Cruza con Supabase: detecta que María llenó form hace 3 días</li>
+      <li>Saluda por nombre, conoce ubicación, recuerda intent</li>
+      <li>Responde la pregunta exacta: horarios de spinning Caguas</li>
+      <li>Agenda free trial en Jonas vía tool call</li>
+      <li>Notifica al vendedor con resumen + lead caliente etiquetado</li>
+    </ul>
+  </div>
+</section>
+
+<section class="strip">
+  <h2>Mismo WhatsApp. <span class="red">Cerebro distinto.</span></h2>
+  <p>El bot actual responde a flujos rígidos pre-programados. El bot con cerebro Claude accede al contexto completo del lead — número, nombre, historial, intent — desde el segundo cero. Cero preguntas redundantes. Cero fricción de marca.</p>
+  <span class="accent-line">Eso es lo que separa $25/mo de ManyChat manual de un sistema que vende solo</span>
+</section>
+
+<script>
+  const leftScript = [
+    {who:'in', text:'Hola, qué tal el horario de spinning en Caguas?', t:'9:47 AM', delay:0, typing:0},
+    {who:'out', text:'¡Hola! 👋 Soy el asistente de WestSide. ¿Cuál es tu nombre?', t:'9:47 AM', delay:1200, typing:1000},
+    {who:'in', text:'María', t:'9:48 AM', delay:1400, typing:0},
+    {who:'out', text:'Gracias María. ¿Cuál es tu número de teléfono?', t:'9:48 AM', delay:1100, typing:900},
+    {who:'in', text:'pero estoy escribiéndote por aquí 🤔', t:'9:48 AM', delay:1600, typing:0},
+    {who:'out', text:'Lo necesitamos para nuestros registros. ¿Tu número?', t:'9:49 AM', delay:1300, typing:1000},
+    {who:'in', text:'787-555-1234', t:'9:49 AM', delay:2000, typing:0},
+    {who:'out', text:'¿Qué ubicación te interesa?', t:'9:49 AM', delay:1100, typing:900},
+    {who:'in', text:'Caguas (ya lo había dicho)', t:'9:50 AM', delay:1500, typing:0},
+    {who:'out', text:'Selecciona una opción:\n1) Membresía\n2) Free Trial\n3) Horarios\n4) Hablar con un agente', t:'9:50 AM', delay:1100, typing:1000},
+    {who:'in', text:'😒', t:'9:51 AM', delay:1800, typing:0},
+  ];
+
+  const rightScript = [
+    {who:'in', text:'Hola, qué tal el horario de spinning en Caguas?', t:'9:47 AM', delay:0, typing:0},
+    {who:'out', text:'¡Hola María! 👋 Vi que llenaste el form de free trial pa\' Caguas hace 3 días — bien que te animaste a escribirme.\n\nSpinning en Caguas:\n• Lun/Mié 6am, 5:30pm, 7pm\n• Sáb 9am\n\n¿Te animas a probarlo el sábado a las 9am? Te puedo agendar el free trial ahí mismo.', t:'9:47 AM', delay:1300, typing:1100},
+    {who:'in', text:'brutal, sí, sábado 9am', t:'9:48 AM', delay:1400, typing:0},
+    {who:'out', text:'Perfecto María, agendado pa\' el sábado 9am en Caguas. 🔥\n\nTe llega confirmación por aquí + recordatorio el viernes. Trae ropa cómoda y agua. Cualquier pregunta antes del sábado, escríbeme directo.', t:'9:48 AM', delay:1200, typing:1000},
+    {who:'in', text:'gracias!! 💪', t:'9:48 AM', delay:1500, typing:0},
+  ];
+
+  function renderMsg(m){
+    const wrap = document.createElement('div');
+    wrap.className = `msg ${m.who}`;
+    const text = document.createElement('div');
+    text.style.whiteSpace = 'pre-line';
+    text.textContent = m.text;
+    wrap.appendChild(text);
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `${m.t}${m.who==='out'?' <span class="check">✓✓</span>':''}`;
+    wrap.appendChild(meta);
+    return wrap;
+  }
+
+  function makeTyping(){
+    const t = document.createElement('div');
+    t.className = 'typing show';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    return t;
+  }
+
+  async function play(script, container, chatEl){
+    container.innerHTML = '';
+    for (const m of script){
+      await new Promise(r=>setTimeout(r,m.delay));
+      if (m.typing && m.who==='out'){
+        const t = makeTyping();
+        container.appendChild(t);
+        chatEl.scrollTop = chatEl.scrollHeight;
+        await new Promise(r=>setTimeout(r,m.typing));
+        t.remove();
+      }
+      const node = renderMsg(m);
+      container.appendChild(node);
+      requestAnimationFrame(()=>node.classList.add('show'));
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+  }
+
+  let playing = false;
+  async function start(){
+    if (playing) return;
+    playing = true;
+    const left = document.getElementById('left-msgs');
+    const right = document.getElementById('right-msgs');
+    const chatL = document.getElementById('chat-left');
+    const chatR = document.getElementById('chat-right');
+    await Promise.all([
+      play(leftScript, left, chatL),
+      play(rightScript, right, chatR)
+    ]);
+    playing = false;
+  }
+
+  document.getElementById('play').addEventListener('click', start);
+  document.getElementById('reset').addEventListener('click', ()=>{
+    document.getElementById('left-msgs').innerHTML = '';
+    document.getElementById('right-msgs').innerHTML = '';
+    playing = false;
+  });
+  document.getElementById('print').addEventListener('click', ()=>{
+    document.querySelectorAll('.msg').forEach(m=>m.classList.add('show'));
+    setTimeout(()=>window.print(),200);
+  });
+
+  // Auto-play on load after a short pause
+  setTimeout(start, 600);
+</script>
+
+</body>
+</html>
