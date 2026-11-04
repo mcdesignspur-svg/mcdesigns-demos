@@ -32,6 +32,7 @@ mcdesigns-demos/
 | Cliente | URL | Propósito | Estado |
 |---|---|---|---|
 | WestSide Fitness | `/westside` | Pilar 1 (leads) + dashboard simulado | Activo |
+| WestSide Fitness | `/westside/llamadas` | Llamadas WebRTC (Telnyx) desde el navegador con el número de la sucursal. Variables: `TELNYX_API_KEY`, `TELNYX_WEBRTC_CONNECTION_ID`, `TELNYX_CALLER_NUMBER`, `DEMO_LLAMADAS_PIN` | Demo |
 | Parts Aviation Solutions | `/aviation` + `/aviation/dashboard` + `/aviation/email-parse` | RFQ triage + Ops center + Email parser (Claude Haiku) | Activo |
 | Burbuja Social | `/burbuja` | CRM centralizado 3 líneas (agencia/foto/alquiler) + AI routing | Activo |
 | Eco (MC Designs producto) | `/eco` + `/eco/builder` + `/eco/studio` | Voice cloning para marcas personales — cuestionario + uploads + humanizer (Sonnet 4.6) | Validación |

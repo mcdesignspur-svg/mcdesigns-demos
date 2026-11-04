@@ -12,6 +12,7 @@ export default defineConfig({
                 westsideCalendar: resolve(__dirname, 'westside/calendar.html'),
                 westsideComparison: resolve(__dirname, 'westside/comparison.html'),
                 westsideProyecto: resolve(__dirname, 'westside/proyecto.html'),
+                westsideLlamadas: resolve(__dirname, 'westside/llamadas.html'),
                 aviation: resolve(__dirname, 'aviation/index.html'),
                 aviationDashboard: resolve(__dirname, 'aviation/dashboard.html'),
                 aviationEmailParse: resolve(__dirname, 'aviation/email-parse.html'),
