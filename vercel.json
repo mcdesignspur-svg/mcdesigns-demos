@@ -10,6 +10,7 @@
     { "source": "/westside/calendar", "destination": "/westside/calendar.html" },
     { "source": "/westside/comparison", "destination": "/westside/comparison.html" },
     { "source": "/westside/proyecto", "destination": "/westside/proyecto.html" },
+    { "source": "/westside/llamadas", "destination": "/westside/llamadas.html" },
     { "source": "/aviation", "destination": "/aviation/index.html" },
     { "source": "/aviation/dashboard", "destination": "/aviation/dashboard.html" },
     { "source": "/aviation/email-parse", "destination": "/aviation/email-parse.html" },
