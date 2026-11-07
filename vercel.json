@@ -19,6 +19,8 @@
     { "source": "/eco", "destination": "/eco/index.html" },
     { "source": "/eco/builder", "destination": "/eco/builder.html" },
     { "source": "/eco/studio", "destination": "/eco/studio.html" },
+    { "source": "/siovera", "destination": "/siovera/index.html" },
+    { "source": "/siovera/admin", "destination": "/siovera/admin.html" },
     { "source": "/prototypes/westside", "destination": "/prototypes/westside/index.html" }
   ],
   "headers": [

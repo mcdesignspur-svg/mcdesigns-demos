@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Siovera Distributor — Panel</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: { navy: '#14233C', navy2: '#1F3557', brand: '#E8731C', brandDark: '#C95E10', paper: '#F6F4EF' },
+                fontFamily: { sans: ['Inter', 'sans-serif'] },
+            } }
+        }
+    </script>
+    <style>
+        body { background: #F6F4EF; }
+        .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 2px rgba(20,35,60,.06), 0 4px 16px rgba(20,35,60,.05); }
+        .tab { padding: .7rem 1rem; border-radius: 10px; font-weight: 600; color: rgba(255,255,255,.7); white-space: nowrap; }
+        .tab.on { background: rgba(255,255,255,.12); color: #fff; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 10px; font-weight: 700; padding: .6rem 1rem; }
+        .btn-brand { background: #E8731C; color: #fff; } .btn-brand:hover { background: #C95E10; }
+        .btn-ghost { background: #fff; border: 1.5px solid #D9D4C7; } .btn-ghost:hover { border-color: #14233C; }
+        th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: rgba(20,35,60,.55); font-weight: 600; padding: .6rem .75rem; }
+        td { padding: .7rem .75rem; vertical-align: middle; }
+        tbody tr { border-top: 1px solid #EEEAE1; }
+        tbody tr.click:hover { background: #FBFAF7; cursor: pointer; }
+        [hidden] { display: none !important; }
+        .pill { padding: .2rem .6rem; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+        @keyframes flash { from { background: #FFF1E3 } to { background: transparent } }
+        .flash { animation: flash 2.5s ease-out; }
+    </style>
+</head>
+<body class="text-navy min-h-screen">
+
+<header class="bg-navy text-white">
+    <div class="max-w-6xl mx-auto px-4 pt-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand text-white text-xl font-extrabold flex items-center justify-center">S</div>
+                <div><p class="font-bold leading-tight">Siovera Distributor</p><p class="text-white/60 text-sm leading-tight">Panel de administración · Demo</p></div>
+            </div>
+            <div class="flex gap-4 text-sm text-white/70">
+                <a href="/siovera" class="underline hover:text-white">← Ver portal de clientes</a>
+                <button id="resetDemo" class="underline hover:text-white">Reiniciar demo</button>
+            </div>
+        </div>
+        <nav id="tabs" class="flex gap-1 mt-4 overflow-x-auto">
+            <button class="tab on" data-tab="orders">Órdenes <span id="newBadge" class="ml-1 bg-brand text-white rounded-full px-2 text-xs" hidden></span></button>
+            <button class="tab" data-tab="inventory">Inventario</button>
+            <button class="tab" data-tab="clients">Clientes</button>
+            <button class="tab" data-tab="import">Importar de Retail Manager</button>
+        </nav>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <!-- KPIs -->
+    <div id="kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+    <!-- Órdenes -->
+    <section id="tabOrders" class="mt-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <h2 class="text-xl font-extrabold">Órdenes</h2>
+            <div id="statusFilter" class="flex gap-2 flex-wrap text-sm"></div>
+        </div>
+        <div class="card overflow-x-auto">
+            <table class="w-full min-w-[720px]">
+                <thead><tr><th>Orden</th><th>Cliente</th><th>Área</th><th>Fecha</th><th class="text-right">Total</th><th>Estado</th></tr></thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Inventario -->
+    <section id="tabInventory" class="mt-6" hidden>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <h2 class="text-xl font-extrabold">Inventario</h2>
+            <div class="flex gap-2 items-center">
+                <label class="text-sm flex items-center gap-2"><input type="checkbox" id="onlyLow" class="rounded"> Solo productos bajos</label>
+                <input id="invSearch" placeholder="Buscar…" class="rounded-lg border-[#D9D4C7] text-sm py-2" />
+            </div>
+        </div>
+        <div class="card overflow-x-auto">
+            <table class="w-full min-w-[820px]">
+                <thead><tr><th>SKU</th><th>Producto</th><th>Unidad</th><th class="text-right">Lista A</th><th class="text-right">Lista B</th><th class="text-right">Lista C</th><th class="text-center">Mínimo</th><th class="text-center">Existencia</th><th></th></tr></thead>
+                <tbody id="invBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Clientes -->
+    <section id="tabClients" class="mt-6" hidden>
+        <h2 class="text-xl font-extrabold mb-3">Clientes</h2>
+        <div class="card overflow-x-auto">
+            <table class="w-full min-w-[720px]">
+                <thead><tr><th>#</th><th>Negocio</th><th>Contacto</th><th>Área</th><th>Lista de precio</th><th>IVU</th><th class="text-right">Compras</th></tr></thead>
+                <tbody id="clientsBody"></tbody>
+            </table>
+        </div>
+        <div class="card p-5 mt-4">
+            <p class="font-bold mb-2">Pedido mínimo por área</p>
+            <div id="areasBox" class="flex flex-wrap gap-3 text-sm"></div>
+        </div>
+    </section>
+
+    <!-- Importar -->
+    <section id="tabImport" class="mt-6" hidden>
+        <h2 class="text-xl font-extrabold mb-1">Importar productos e inventario</h2>
+        <p class="text-navy/70 mb-4">Exporte el inventario desde Retail Manager (Excel o CSV) y súbalo aquí. El portal actualiza existencias y precios, y crea los productos nuevos.</p>
+        <div class="grid lg:grid-cols-2 gap-4">
+            <div class="card p-5">
+                <label id="drop" class="block border-2 border-dashed border-[#D9D4C7] rounded-xl p-8 text-center cursor-pointer hover:border-navy">
+                    <div class="text-4xl">📄</div>
+                    <p class="font-bold mt-2">Seleccione el archivo CSV</p>
+                    <p class="text-sm text-navy/60">Columnas: sku, descripcion, existencia, precio_a, precio_b, precio_c</p>
+                    <input type="file" id="fileInput" accept=".csv,text/csv" class="hidden">
+                </label>
+                <button id="useSample" class="btn btn-brand w-full mt-4">Probar con archivo de ejemplo</button>
+                <p id="lastImport" class="text-sm text-navy/60 mt-3"></p>
+            </div>
+            <div class="card p-5">
+                <p class="font-bold mb-3">Resultado</p>
+                <div id="importResult" class="text-sm text-navy/60">Todavía no se ha importado ningún archivo.</div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Detalle de orden -->
+<div id="drawer" class="fixed inset-0 z-50" hidden>
+    <div class="absolute inset-0 bg-navy/40" data-close></div>
+    <aside class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl overflow-y-auto">
+        <div class="p-5 border-b flex items-center justify-between sticky top-0 bg-white">
+            <h3 class="text-xl font-extrabold" id="dTitle"></h3>
+            <button data-close class="text-2xl leading-none">×</button>
+        </div>
+        <div class="p-5" id="dBody"></div>
+    </aside>
+</div>
+
+<script type="module">
+import { load, save, reset, money, orderTotals, fmtDate, STATUSES, AREAS, PRICE_LISTS, SAMPLE_IMPORT, parseImport, applyImport } from './data.js'
+
+let state = load()
+let tab = 'orders'
+let statusF = 'Activas'
+const $ = id => document.getElementById(id)
+const client = id => state.clients.find(c => c.id === id)
+const product = id => state.products.find(p => p.id === id)
+const STATUS_STYLE = { 'Recibida': 'bg-sky-100 text-sky-900', 'Preparando': 'bg-amber-100 text-amber-900', 'En ruta': 'bg-violet-100 text-violet-900', 'Entregada': 'bg-emerald-100 text-emerald-900' }
+
+$('tabs').addEventListener('click', e => {
+    const b = e.target.closest('[data-tab]'); if (!b) return
+    tab = b.dataset.tab
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t === b))
+    render()
+})
+$('resetDemo').onclick = () => { state = reset(); render() }
+
+function render() {
+    ;['orders', 'inventory', 'clients', 'import'].forEach(t => $('tab' + t[0].toUpperCase() + t.slice(1)).hidden = tab !== t)
+    renderKpis()
+    if (tab === 'orders') renderOrders()
+    if (tab === 'inventory') renderInventory()
+    if (tab === 'clients') renderClients()
+    if (tab === 'import') renderImportInfo()
+    const nNew = state.orders.filter(o => o.status === 'Recibida').length
+    $('newBadge').hidden = !nNew; $('newBadge').textContent = nNew
+}
+
+function renderKpis() {
+    const today = new Date().toDateString()
+    const todays = state.orders.filter(o => new Date(o.date).toDateString() === today)
+    const pending = state.orders.filter(o => o.status !== 'Entregada')
+    const low = state.products.filter(p => p.stock <= p.low)
+    const weekAgo = Date.now() - 7 * 864e5
+    const week = state.orders.filter(o => new Date(o.date) >= weekAgo).reduce((s, o) => s + orderTotals(o, client(o.clientId)).total, 0)
+    const k = (label, val, sub, warn) => `<div class="card p-4"><p class="text-sm text-navy/60">${label}</p><p class="text-3xl font-extrabold mt-1 ${warn ? 'text-red-700' : ''}">${val}</p><p class="text-xs text-navy/50 mt-1">${sub}</p></div>`
+    $('kpis').innerHTML =
+        k('Órdenes de hoy', todays.length, money(todays.reduce((s, o) => s + orderTotals(o, client(o.clientId)).total, 0))) +
+        k('Por entregar', pending.length, 'Recibidas, preparando o en ruta') +
+        k('Productos bajos', low.length, low.length ? 'Revisar inventario' : 'Todo en orden', low.length > 0) +
+        k('Ventas últimos 7 días', money(week), `${state.orders.filter(o => new Date(o.date) >= weekAgo).length} órdenes`)
+}
+
+// ---------- Órdenes ----------
+function renderOrders() {
+    const filters = ['Activas', ...STATUSES, 'Todas']
+    $('statusFilter').innerHTML = filters.map(f => `<button data-sf="${f}" class="px-3 py-1.5 rounded-full border ${f === statusF ? 'bg-navy text-white border-navy' : 'bg-white border-[#D9D4C7]'}">${f}</button>`).join('')
+    const list = state.orders.filter(o => statusF === 'Todas' || (statusF === 'Activas' ? o.status !== 'Entregada' : o.status === statusF))
+    $('ordersBody').innerHTML = list.map(o => {
+        const c = client(o.clientId), t = orderTotals(o, c)
+        return `<tr class="click ${o.isNew ? 'flash' : ''}" data-order="${o.id}">
+            <td class="font-bold">${o.id}${o.isNew ? ' <span class="pill bg-brand text-white ml-1">Nueva</span>' : ''}</td>
+            <td>${c.name}</td><td>${c.area}</td><td class="text-navy/70">${fmtDate(o.date)}</td>
+            <td class="text-right font-semibold">${money(t.total)}</td>
+            <td><select data-status="${o.id}" class="rounded-lg text-sm py-1.5 border-0 font-semibold ${STATUS_STYLE[o.status]}">${STATUSES.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+        </tr>`
+    }).join('') || `<tr><td colspan="6" class="text-center text-navy/60 py-8">No hay órdenes en este estado.</td></tr>`
+}
+$('statusFilter').addEventListener('click', e => { const b = e.target.closest('[data-sf]'); if (b) { statusF = b.dataset.sf; renderOrders() } })
+$('ordersBody').addEventListener('change', e => {
+    const id = e.target.dataset.status; if (!id) return
+    const o = state.orders.find(x => x.id === id); o.status = e.target.value; delete o.isNew
+    save(state); render()
+})
+$('ordersBody').addEventListener('click', e => {
+    if (e.target.closest('select')) return
+    const r = e.target.closest('[data-order]'); if (r) openOrder(r.dataset.order)
+})
+
+function openOrder(id) {
+    const o = state.orders.find(x => x.id === id), c = client(o.clientId), t = orderTotals(o, c)
+    if (o.isNew) { delete o.isNew; save(state); renderOrders() }
+    $('dTitle').textContent = 'Orden ' + o.id
+    $('dBody').innerHTML = `
+        <div class="space-y-1">
+            <p class="font-bold text-lg">${c.name}</p>
+            <p class="text-navy/70">${c.contact} · Cliente #${c.id}</p>
+            <p class="text-navy/70">Área ${c.area} · Lista ${c.list} (${PRICE_LISTS[c.list]}) · ${c.exempt ? 'Exento de IVU' : 'Paga IVU'}</p>
+            <p class="text-navy/70">${fmtDate(o.date)} · Pago contra entrega</p>
+        </div>
+        ${o.notes ? `<p class="mt-4 p-3 rounded-lg bg-amber-50 text-amber-900"><b>Nota:</b> ${o.notes.replace(/</g, '&lt;')}</p>` : ''}
+        <table class="w-full mt-4 text-sm"><thead><tr><th>Producto</th><th class="text-center">Cant.</th><th class="text-right">Total</th></tr></thead><tbody>
+        ${o.items.map(i => { const p = product(i.pid); return `<tr><td>${p ? p.name : i.pid}<div class="text-xs text-navy/50">${p ? p.sku + ' · ' + p.unit : ''} · ${money(i.price)}</div></td><td class="text-center">${i.qty}</td><td class="text-right">${money(i.qty * i.price)}</td></tr>` }).join('')}
+        </tbody></table>
+        <div class="border-t mt-2 pt-3 space-y-1 text-sm">
+            <div class="flex justify-between"><span>Subtotal</span><span>${money(t.subtotal)}</span></div>
+            <div class="flex justify-between"><span>IVU</span><span>${c.exempt ? 'Exento' : money(t.ivu)}</span></div>
+            <div class="flex justify-between text-lg font-extrabold"><span>Total a cobrar</span><span>${money(t.total)}</span></div>
+        </div>
+        <p class="font-bold mt-6 mb-2">Estado</p>
+        <div class="grid grid-cols-2 gap-2">${STATUSES.map(s => `<button data-set="${s}" class="btn ${s === o.status ? 'btn-brand' : 'btn-ghost'}">${s}</button>`).join('')}</div>
+        <button onclick="window.print()" class="btn btn-ghost w-full mt-3">🖨️ Imprimir hoja de despacho</button>`
+    $('dBody').onclick = e => {
+        const s = e.target.closest('[data-set]'); if (!s) return
+        o.status = s.dataset.set; save(state); render(); openOrder(o.id)
+    }
+    $('drawer').hidden = false
+}
+$('drawer').addEventListener('click', e => { if (e.target.closest('[data-close]')) $('drawer').hidden = true })
+
+// ---------- Inventario ----------
+function renderInventory() {
+    const q = $('invSearch').value.trim().toLowerCase(), onlyLow = $('onlyLow').checked
+    const list = state.products.filter(p => (!onlyLow || p.stock <= p.low) && (!q || (p.name + p.sku).toLowerCase().includes(q)))
+    $('invBody').innerHTML = list.map(p => {
+        const status = p.stock <= 0 ? ['Agotado', 'bg-red-100 text-red-800'] : p.stock <= p.low ? ['Bajo', 'bg-amber-100 text-amber-900'] : ['OK', 'bg-emerald-50 text-emerald-800']
+        return `<tr>
+            <td class="text-xs text-navy/60">${p.sku}</td>
+            <td><span class="mr-1">${p.emoji}</span>${p.name}</td>
+            <td class="text-sm text-navy/70">${p.unit}</td>
+            <td class="text-right">${money(p.prices.A)}</td><td class="text-right">${money(p.prices.B)}</td><td class="text-right">${money(p.prices.C)}</td>
+            <td class="text-center">${p.min}</td>
+            <td class="text-center"><input type="number" min="0" value="${p.stock}" data-stock="${p.id}" class="w-20 rounded-lg border-[#D9D4C7] text-center text-sm py-1"></td>
+            <td><span class="pill ${status[1]}">${status[0]}</span></td>
+        </tr>`
+    }).join('')
+}
+$('invSearch').addEventListener('input', renderInventory)
+$('onlyLow').addEventListener('change', renderInventory)
+$('invBody').addEventListener('change', e => {
+    const id = e.target.dataset.stock; if (!id) return
+    product(id).stock = Math.max(0, parseInt(e.target.value || '0', 10)); save(state); renderKpis(); renderInventory()
+})
+
+// ---------- Clientes ----------
+function renderClients() {
+    $('clientsBody').innerHTML = state.clients.map(c => {
+        const spent = state.orders.filter(o => o.clientId === c.id).reduce((s, o) => s + orderTotals(o, c).total, 0)
+        return `<tr><td class="text-navy/60">${c.id}</td><td class="font-semibold">${c.name}</td><td>${c.contact}</td><td>${c.area}</td>
+            <td>Lista ${c.list} · ${PRICE_LISTS[c.list]}</td><td>${c.exempt ? '<span class="pill bg-emerald-50 text-emerald-800">Exento</span>' : '11.5%'}</td>
+            <td class="text-right">${money(spent)}</td></tr>`
+    }).join('')
+    $('areasBox').innerHTML = Object.entries(AREAS).map(([a, m]) => `<span class="px-3 py-2 rounded-lg bg-paper"><b>${a}</b> · ${money(m)}</span>`).join('')
+}
+
+// ---------- Importar ----------
+function renderImportInfo() {
+    $('lastImport').textContent = state.lastImport ? 'Última importación: ' + fmtDate(state.lastImport) : ''
+}
+function runImport(text, fileName) {
+    let rows
+    try { rows = parseImport(text) } catch (e) { rows = [] }
+    if (!rows.length) { $('importResult').innerHTML = '<p class="text-red-700 font-semibold">No pudimos leer el archivo. Verifique las columnas.</p>'; return }
+    const changes = applyImport(state, rows)
+    $('importResult').innerHTML = `<p class="text-navy font-semibold mb-3">${fileName}: ${rows.length} filas leídas · ${changes.length} cambios</p>` +
+        (changes.length ? `<ul class="space-y-2">${changes.map(c => `<li class="flex items-start gap-2"><span class="pill shrink-0 ${c.kind === 'Nuevo' ? 'bg-sky-100 text-sky-900' : 'bg-emerald-50 text-emerald-800'}">${c.kind}</span><span><b class="text-navy">${c.name}</b> <span class="text-navy/50">(${c.sku})</span><br>${c.detail}</span></li>`).join('')}</ul>` : '<p>Todo estaba al día.</p>')
+    render()
+}
+$('useSample').onclick = () => runImport(SAMPLE_IMPORT, 'inventario-retail-manager.csv')
+$('fileInput').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return
+    const r = new FileReader(); r.onload = () => runImport(r.result, f.name); r.readAsText(f)
+})
+
+// Órdenes nuevas desde el portal en otra pestaña
+window.addEventListener('storage', () => { state = load(); render() })
+
+render()
+</script>
+</body>
+</html>
