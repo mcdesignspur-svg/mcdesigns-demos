@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Siovera Distributor — Pedidos</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#14233C',
+                        navy2: '#1F3557',
+                        brand: '#E8731C',
+                        brandDark: '#C95E10',
+                        paper: '#F6F4EF',
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #F6F4EF; font-size: 18px; }
+        .card { background: #fff; border-radius: 18px; box-shadow: 0 1px 2px rgba(20,35,60,.06), 0 4px 16px rgba(20,35,60,.05); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: 14px; font-weight: 700; min-height: 52px; padding: 0 1.25rem; transition: transform .05s, background .15s; }
+        .btn:active { transform: scale(.98); }
+        .btn-brand { background: #E8731C; color: #fff; }
+        .btn-brand:hover { background: #C95E10; }
+        .btn-ghost { background: #fff; color: #14233C; border: 2px solid #D9D4C7; }
+        .btn-ghost:hover { border-color: #14233C; }
+        .qty-btn { width: 52px; height: 52px; border-radius: 14px; font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .chip { white-space: nowrap; border-radius: 999px; padding: .6rem 1.1rem; font-weight: 600; border: 2px solid #D9D4C7; background: #fff; }
+        .chip.on { background: #14233C; color: #fff; border-color: #14233C; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { scrollbar-width: none; }
+        [hidden] { display: none !important; }
+        .toast { position: fixed; left: 50%; bottom: 120px; transform: translateX(-50%); background: #14233C; color: #fff; padding: .8rem 1.2rem; border-radius: 12px; font-weight: 600; z-index: 60; }
+    </style>
+</head>
+<body class="text-navy min-h-screen">
+
+<!-- Barra demo -->
+<div class="bg-navy text-white/80 text-sm">
+    <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+        <span>Demo de MC Designs para Siovera Distributor. Los datos son de ejemplo.</span>
+        <span class="flex gap-4">
+            <a href="/siovera/admin" class="underline hover:text-white">Ver panel de Siovera →</a>
+            <button id="resetDemo" class="underline hover:text-white">Reiniciar demo</button>
+        </span>
+    </div>
+</div>
+
+<!-- LOGIN -->
+<section id="viewLogin" class="max-w-md mx-auto px-4 py-12">
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand text-white text-3xl font-extrabold mb-4">S</div>
+        <h1 class="text-3xl font-extrabold">Siovera Distributor</h1>
+        <p class="text-lg text-navy/70 mt-2">Haga su pedido en línea. Pago al recibir.</p>
+    </div>
+    <form id="loginForm" class="card p-6 space-y-5">
+        <label class="block">
+            <span class="font-semibold">Número de cliente</span>
+            <input id="loginId" inputmode="numeric" class="mt-2 w-full rounded-xl border-2 border-[#D9D4C7] text-xl py-3 px-4 focus:border-navy focus:ring-0" value="1001" />
+        </label>
+        <label class="block">
+            <span class="font-semibold">PIN</span>
+            <input id="loginPin" type="password" inputmode="numeric" class="mt-2 w-full rounded-xl border-2 border-[#D9D4C7] text-xl py-3 px-4 focus:border-navy focus:ring-0" value="1234" />
+        </label>
+        <p id="loginErr" class="text-red-700 font-semibold" hidden>Número o PIN incorrecto.</p>
+        <button class="btn btn-brand w-full text-xl">Entrar</button>
+        <div class="text-sm text-navy/60 border-t pt-4">
+            <p class="font-semibold mb-1">Cuentas de prueba (PIN 1234):</p>
+            <ul id="demoAccounts" class="space-y-1"></ul>
+        </div>
+    </form>
+</section>
+
+<!-- APP -->
+<div id="viewApp" hidden>
+    <header class="bg-white border-b sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-brand text-white text-xl font-extrabold flex items-center justify-center shrink-0">S</div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm text-navy/60 leading-tight">Hola,</p>
+                <p id="clientName" class="font-bold truncate leading-tight"></p>
+            </div>
+            <button data-go="orders" class="btn btn-ghost text-base !min-h-[44px] !px-3">Pedidos</button>
+            <button id="logout" class="text-sm underline text-navy/60">Salir</button>
+        </div>
+    </header>
+
+    <!-- Catálogo -->
+    <main id="viewCatalog" class="max-w-5xl mx-auto px-4 pb-40">
+        <div id="repeatBox" class="card p-5 mt-5 flex flex-col sm:flex-row sm:items-center gap-4" hidden>
+            <div class="flex-1">
+                <p class="font-bold text-lg">¿Lo mismo de la última vez?</p>
+                <p id="repeatInfo" class="text-navy/70"></p>
+            </div>
+            <button id="repeatBtn" class="btn btn-brand text-lg">↻ Repetir mi último pedido</button>
+        </div>
+
+        <div class="mt-5 relative">
+            <input id="search" placeholder="Buscar producto…" class="w-full rounded-2xl border-2 border-[#D9D4C7] text-xl py-4 pl-14 pr-4 focus:border-navy focus:ring-0" />
+            <span class="absolute left-5 top-1/2 -translate-y-1/2 text-2xl">🔍</span>
+        </div>
+        <div id="cats" class="flex gap-2 overflow-x-auto hide-scroll mt-4 pb-1"></div>
+        <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5"></div>
+    </main>
+
+    <!-- Carrito -->
+    <main id="viewCart" class="max-w-3xl mx-auto px-4 pb-40" hidden>
+        <button data-go="catalog" class="mt-5 underline text-lg">← Seguir comprando</button>
+        <h2 class="text-3xl font-extrabold mt-3">Su pedido</h2>
+        <div id="cartList" class="card mt-4 divide-y"></div>
+        <div class="card p-5 mt-4 space-y-2 text-lg" id="cartTotals"></div>
+        <label class="block mt-4">
+            <span class="font-semibold">Nota para Siovera (opcional)</span>
+            <textarea id="cartNotes" rows="2" class="mt-2 w-full rounded-xl border-2 border-[#D9D4C7] text-lg p-3 focus:border-navy focus:ring-0" placeholder="Ej.: entregar en la mañana"></textarea>
+        </label>
+        <div class="card p-5 mt-4 flex items-start gap-3">
+            <span class="text-2xl">💵</span>
+            <div><p class="font-bold">Pago contra entrega</p><p class="text-navy/70">Paga en efectivo o cheque cuando le llegue el pedido.</p></div>
+        </div>
+        <p id="cartWarn" class="mt-4 p-4 rounded-xl bg-amber-100 text-amber-900 font-semibold" hidden></p>
+        <button id="placeOrder" class="btn btn-brand w-full text-xl mt-5">Enviar pedido</button>
+    </main>
+
+    <!-- Confirmación -->
+    <main id="viewDone" class="max-w-md mx-auto px-4 py-12 text-center" hidden>
+        <div class="text-6xl">✅</div>
+        <h2 class="text-3xl font-extrabold mt-4">¡Pedido recibido!</h2>
+        <p class="text-xl mt-3">Número de pedido <b id="doneId"></b></p>
+        <p class="text-navy/70 mt-2">Le enviamos la confirmación por correo. Siovera le avisará cuando salga para entrega.</p>
+        <div class="flex flex-col gap-3 mt-8">
+            <button data-go="orders" class="btn btn-ghost text-lg">Ver mis pedidos</button>
+            <button data-go="catalog" class="btn btn-brand text-lg">Volver al catálogo</button>
+        </div>
+    </main>
+
+    <!-- Historial -->
+    <main id="viewOrders" class="max-w-3xl mx-auto px-4 pb-40" hidden>
+        <button data-go="catalog" class="mt-5 underline text-lg">← Volver al catálogo</button>
+        <h2 class="text-3xl font-extrabold mt-3">Mis pedidos</h2>
+        <div id="ordersList" class="space-y-4 mt-4"></div>
+    </main>
+
+    <!-- Barra inferior del carrito -->
+    <div id="cartBar" class="fixed bottom-0 inset-x-0 z-40 bg-white border-t shadow-[0_-4px_20px_rgba(20,35,60,.08)]" hidden>
+        <div class="max-w-5xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between text-sm text-navy/70 mb-1">
+                <span id="minLabel"></span><span id="minPct"></span>
+            </div>
+            <div class="h-2 rounded-full bg-[#ECE8DE] overflow-hidden mb-3"><div id="minBar" class="h-full bg-brand transition-all"></div></div>
+            <div class="flex items-center gap-3">
+                <div class="flex-1">
+                    <p class="text-sm text-navy/60" id="cartCount"></p>
+                    <p class="text-2xl font-extrabold" id="cartTotal"></p>
+                </div>
+                <button data-go="cart" class="btn btn-brand text-lg">Ver pedido →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script type="module">
+import { load, save, reset, money, placeOrder, orderTotals, fmtDate, CATEGORIES, AREAS, PRICE_LISTS, IVU } from './data.js'
+
+let state = load()
+let client = null
+let cart = {}
+let cat = 'todo'
+let view = 'catalog'
+const $ = id => document.getElementById(id)
+
+try { const s = sessionStorage.getItem('siovera-client'); if (s) client = state.clients.find(c => c.id === s) || null } catch (e) {}
+
+function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.hidden = false
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 2200)
+}
+
+// ---------- Login ----------
+$('demoAccounts').innerHTML = state.clients.slice(0, 3).map(c =>
+    `<li><button type="button" class="underline" data-acc="${c.id}">${c.id}</button> · ${c.name} (${PRICE_LISTS[c.list]}, ${c.area})</li>`).join('')
+$('demoAccounts').addEventListener('click', e => {
+    const id = e.target.dataset.acc; if (id) { $('loginId').value = id; $('loginPin').value = '1234' }
+})
+$('loginForm').addEventListener('submit', e => {
+    e.preventDefault()
+    const c = state.clients.find(x => x.id === $('loginId').value.trim() && x.pin === $('loginPin').value.trim())
+    if (!c) { $('loginErr').hidden = false; return }
+    client = c; cart = {}
+    try { sessionStorage.setItem('siovera-client', c.id) } catch (e) {}
+    start()
+})
+$('logout').onclick = () => { client = null; cart = {}; try { sessionStorage.removeItem('siovera-client') } catch (e) {}; render() }
+$('resetDemo').onclick = () => { state = reset(); client = null; cart = {}; try { sessionStorage.removeItem('siovera-client') } catch (e) {}; render(); toast('Demo reiniciado') }
+
+function start() { $('loginErr').hidden = true; view = 'catalog'; render() }
+
+// ---------- Helpers ----------
+const price = p => p.prices[client.list]
+const myOrders = () => state.orders.filter(o => o.clientId === client.id)
+function cartSubtotal() {
+    return Object.entries(cart).reduce((s, [pid, q]) => s + q * price(state.products.find(p => p.id === pid)), 0)
+}
+function setQty(pid, q) {
+    const p = state.products.find(x => x.id === pid)
+    if (q > 0 && q < p.min) q = p.min
+    q = Math.min(q, p.stock)
+    if (q <= 0) delete cart[pid]; else cart[pid] = q
+    renderGrid(); renderBar(); if (view === 'cart') renderCart()
+}
+
+// ---------- Render ----------
+function render() {
+    $('viewLogin').hidden = !!client
+    $('viewApp').hidden = !client
+    if (!client) return
+    $('clientName').textContent = client.name
+    ;['catalog', 'cart', 'done', 'orders'].forEach(v => $('view' + v[0].toUpperCase() + v.slice(1)).hidden = view !== v)
+    if (view === 'catalog') { renderCats(); renderGrid(); renderRepeat() }
+    if (view === 'cart') renderCart()
+    if (view === 'orders') renderOrders()
+    renderBar()
+    window.scrollTo(0, 0)
+}
+
+function renderRepeat() {
+    const last = myOrders()[0]
+    $('repeatBox').hidden = !last
+    if (last) $('repeatInfo').textContent = `Pedido ${last.id} del ${fmtDate(last.date)} · ${last.items.length} productos`
+}
+
+function renderCats() {
+    const all = [{ id: 'todo', name: 'Todo', icon: '🛒' }, ...CATEGORIES]
+    $('cats').innerHTML = all.map(c => `<button class="chip ${c.id === cat ? 'on' : ''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`).join('')
+}
+$('cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) { cat = b.dataset.cat; renderCats(); renderGrid() } })
+$('search').addEventListener('input', () => renderGrid())
+
+function renderGrid() {
+    const q = $('search').value.trim().toLowerCase()
+    const items = state.products.filter(p => (cat === 'todo' || p.cat === cat) && (!q || (p.name + ' ' + p.sku).toLowerCase().includes(q)))
+    $('grid').innerHTML = items.map(p => {
+        const q = cart[p.id] || 0
+        const out = p.stock <= 0
+        return `<div class="card p-4 flex flex-col">
+            <div class="flex gap-4">
+                <div class="w-20 h-20 rounded-2xl bg-paper flex items-center justify-center text-4xl shrink-0">${p.emoji}</div>
+                <div class="min-w-0">
+                    <p class="font-bold leading-snug">${p.name}</p>
+                    <p class="text-navy/60 text-base">${p.unit}</p>
+                    <p class="text-2xl font-extrabold mt-1">${money(price(p))}</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-between text-sm mt-3 text-navy/60">
+                <span>${p.min > 1 ? `Mínimo ${p.min}` : '&nbsp;'}</span>
+                <span class="${out ? 'text-red-700 font-semibold' : p.stock <= p.low ? 'text-amber-700 font-semibold' : ''}">${out ? 'Agotado' : p.stock <= p.low ? `Quedan ${p.stock}` : 'Disponible'}</span>
+            </div>
+            <div class="mt-3">
+            ${out ? `<button class="btn w-full bg-[#ECE8DE] text-navy/50" disabled>Agotado</button>` :
+              q === 0 ? `<button class="btn btn-ghost w-full text-lg" data-add="${p.id}">Añadir${p.min > 1 ? ` ${p.min}` : ''}</button>` :
+              `<div class="flex items-center gap-3">
+                  <button class="qty-btn bg-[#ECE8DE]" data-dec="${p.id}" aria-label="Menos">−</button>
+                  <div class="flex-1 text-center"><span class="text-2xl font-extrabold">${q}</span></div>
+                  <button class="qty-btn bg-brand text-white" data-inc="${p.id}" aria-label="Más">+</button>
+               </div>`}
+            </div>
+        </div>`
+    }).join('') || `<p class="text-navy/60 text-lg col-span-full py-10 text-center">No encontramos productos con esa búsqueda.</p>`
+}
+document.addEventListener('click', e => {
+    const t = e.target.closest('[data-add],[data-inc],[data-dec],[data-go],[data-repeat]')
+    if (!t) return
+    const d = t.dataset
+    if (d.add) { const p = state.products.find(x => x.id === d.add); setQty(p.id, p.min) }
+    if (d.inc) setQty(d.inc, (cart[d.inc] || 0) + 1)
+    if (d.dec) { const p = state.products.find(x => x.id === d.dec); const n = cart[p.id] - 1; setQty(p.id, n < p.min ? 0 : n) }
+    if (d.go) { view = d.go; render() }
+    if (d.repeat) repeatOrder(d.repeat)
+})
+
+function repeatOrder(oid) {
+    const o = state.orders.find(x => x.id === oid)
+    cart = {}
+    let skipped = 0
+    o.items.forEach(i => {
+        const p = state.products.find(x => x.id === i.pid)
+        if (!p || p.stock <= 0) { skipped++; return }
+        cart[p.id] = Math.max(p.min, Math.min(i.qty, p.stock))
+    })
+    view = 'cart'; render()
+    toast(skipped ? `Pedido copiado. ${skipped} producto(s) agotado(s) no se añadieron.` : 'Pedido copiado. Revise y envíe.')
+}
+$('repeatBtn').onclick = () => { const last = myOrders()[0]; if (last) repeatOrder(last.id) }
+
+function renderBar() {
+    const n = Object.keys(cart).length
+    $('cartBar').hidden = !n || view === 'done' || view === 'cart'
+    if (!n) return
+    const sub = cartSubtotal(), min = AREAS[client.area]
+    $('cartCount').textContent = `${n} producto${n > 1 ? 's' : ''}`
+    $('cartTotal').textContent = money(sub)
+    const pct = Math.min(100, sub / min * 100)
+    $('minBar').style.width = pct + '%'
+    $('minLabel').textContent = sub >= min ? `✓ Pedido mínimo de ${client.area} alcanzado` : `Faltan ${money(min - sub)} para el mínimo de ${client.area} (${money(min)})`
+    $('minPct').textContent = Math.round(pct) + '%'
+}
+
+function renderCart() {
+    const entries = Object.entries(cart)
+    $('cartList').innerHTML = entries.length ? entries.map(([pid, q]) => {
+        const p = state.products.find(x => x.id === pid)
+        return `<div class="p-4 flex items-center gap-3">
+            <div class="w-14 h-14 rounded-xl bg-paper flex items-center justify-center text-3xl shrink-0">${p.emoji}</div>
+            <div class="flex-1 min-w-0"><p class="font-bold leading-snug">${p.name}</p><p class="text-navy/60 text-base">${money(price(p))} · ${p.unit}</p></div>
+            <div class="flex items-center gap-2">
+                <button class="qty-btn bg-[#ECE8DE] !w-11 !h-11 !text-2xl" data-dec="${p.id}">−</button>
+                <span class="w-8 text-center text-xl font-extrabold">${q}</span>
+                <button class="qty-btn bg-brand text-white !w-11 !h-11 !text-2xl" data-inc="${p.id}">+</button>
+            </div>
+        </div>`
+    }).join('') : `<p class="p-6 text-navy/60">Su pedido está vacío.</p>`
+    const sub = cartSubtotal(), ivu = client.exempt ? 0 : sub * IVU, min = AREAS[client.area]
+    $('cartTotals').innerHTML = `
+        <div class="flex justify-between"><span>Subtotal</span><span>${money(sub)}</span></div>
+        <div class="flex justify-between"><span>IVU</span><span>${client.exempt ? 'Exento' : money(ivu)}</span></div>
+        <div class="flex justify-between text-2xl font-extrabold pt-2 border-t"><span>Total</span><span>${money(sub + ivu)}</span></div>
+        <p class="text-sm text-navy/60">Precios de su lista: ${PRICE_LISTS[client.list]}.</p>`
+    const short = sub < min
+    $('cartWarn').hidden = !short || !entries.length
+    $('cartWarn').textContent = `El pedido mínimo para ${client.area} es ${money(min)}. Le faltan ${money(min - sub)}.`
+    $('placeOrder').disabled = short || !entries.length
+    $('placeOrder').classList.toggle('opacity-40', short || !entries.length)
+}
+
+$('placeOrder').onclick = () => {
+    const o = placeOrder(state, client.id, cart, $('cartNotes').value)
+    cart = {}; $('cartNotes').value = ''
+    $('doneId').textContent = o.id
+    view = 'done'; render()
+}
+
+const STATUS_STYLE = { 'Recibida': 'bg-sky-100 text-sky-900', 'Preparando': 'bg-amber-100 text-amber-900', 'En ruta': 'bg-violet-100 text-violet-900', 'Entregada': 'bg-emerald-100 text-emerald-900' }
+function renderOrders() {
+    const list = myOrders()
+    $('ordersList').innerHTML = list.length ? list.map(o => {
+        const t = orderTotals(o, client)
+        return `<div class="card p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div><p class="font-extrabold text-xl">${o.id}</p><p class="text-navy/60">${fmtDate(o.date)}</p></div>
+                <span class="px-3 py-1 rounded-full font-semibold text-base ${STATUS_STYLE[o.status]}">${o.status}</span>
+            </div>
+            <ul class="mt-3 text-base text-navy/80 space-y-1">${o.items.map(i => {
+                const p = state.products.find(x => x.id === i.pid)
+                return `<li class="flex justify-between gap-3"><span>${i.qty} × ${p ? p.name : i.pid}</span><span>${money(i.qty * i.price)}</span></li>`
+            }).join('')}</ul>
+            <div class="flex items-center justify-between mt-4 pt-3 border-t">
+                <span class="text-xl font-extrabold">${money(t.total)}</span>
+                <button class="btn btn-ghost text-base" data-repeat="${o.id}">↻ Repetir</button>
+            </div>
+        </div>`
+    }).join('') : `<p class="text-navy/60 text-lg">Todavía no tiene pedidos.</p>`
+}
+
+// Si el panel cambia el estado en otra pestaña, refrescar
+window.addEventListener('storage', () => { state = load(); if (client) { client = state.clients.find(c => c.id === client.id); if (view === 'orders') renderOrders() } })
+
+render()
+</script>
+</body>
+</html>

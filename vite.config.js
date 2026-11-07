@@ -21,6 +21,8 @@ export default defineConfig({
                 eco: resolve(__dirname, 'eco/index.html'),
                 ecoBuilder: resolve(__dirname, 'eco/builder.html'),
                 ecoStudio: resolve(__dirname, 'eco/studio.html'),
+                siovera: resolve(__dirname, 'siovera/index.html'),
+                sioveraAdmin: resolve(__dirname, 'siovera/admin.html'),
                 prototypesWestside: resolve(__dirname, 'prototypes/westside/index.html'),
             },
         },
