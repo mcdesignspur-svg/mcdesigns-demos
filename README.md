@@ -35,7 +35,7 @@ mcdesigns-demos/
 | WestSide Fitness | `/westside/llamadas` | Llamadas WebRTC (Telnyx) desde el navegador con el número de la sucursal. Variables: `TELNYX_API_KEY`, `TELNYX_WEBRTC_CONNECTION_ID`, `TELNYX_CALLER_NUMBER`, `DEMO_LLAMADAS_PIN` | Demo |
 | Parts Aviation Solutions | `/aviation` + `/aviation/dashboard` + `/aviation/email-parse` | RFQ triage + Ops center + Email parser (Claude Haiku) | Activo |
 | Burbuja Social | `/burbuja` | CRM centralizado 3 líneas (agencia/foto/alquiler) + AI routing | Activo |
-| Siovera Distributor | `/siovera` + `/siovera/admin` | Portal de pedidos B2B con el catálogo real de Siovera (572 productos, `siovera/catalogo.js`; precios y existencias de ejemplo), listas de precio, mínimos, COD, repetir pedido) + panel (órdenes, inventario, clientes, importar CSV de Retail Manager). Datos en localStorage | Demo |
+| Siovera Distributor | `/siovera` + `/siovera/admin` | Portal de pedidos B2B (cliente 1001 / PIN 1234) y panel (jennifer@sioveradistributor.com / siovera2026) con el catálogo real (572 productos; precios y existencias de ejemplo). Dashboard, órdenes en vivo entre pestañas (BroadcastChannel), factura/despacho imprimible, editar productos y clientes, tomar pedido, importar CSV de Retail Manager, "Modo en vivo" que simula pedidos. Todo en localStorage | Demo |
 | Eco (MC Designs producto) | `/eco` + `/eco/builder` + `/eco/studio` | Voice cloning para marcas personales — cuestionario + uploads + humanizer (Sonnet 4.6) | Validación |
 
 ## Local dev
