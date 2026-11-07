@@ -90,6 +90,7 @@
                 <tbody id="invBody"></tbody>
             </table>
         </div>
+        <p id="invNote" class="text-sm text-navy/60 mt-2"></p>
     </section>
 
     <!-- Clientes -->
@@ -247,7 +248,9 @@ $('drawer').addEventListener('click', e => { if (e.target.closest('[data-close]'
 // ---------- Inventario ----------
 function renderInventory() {
     const q = $('invSearch').value.trim().toLowerCase(), onlyLow = $('onlyLow').checked
-    const list = state.products.filter(p => (!onlyLow || p.stock <= p.low) && (!q || (p.name + p.sku).toLowerCase().includes(q)))
+    const all = state.products.filter(p => (!onlyLow || p.stock <= p.low) && (!q || (p.name + p.sku).toLowerCase().includes(q)))
+    const list = all.slice(0, 100)
+    $('invNote').textContent = all.length > 100 ? `Mostrando 100 de ${all.length} productos. Use la búsqueda para encontrar otros.` : `${all.length} productos`
     $('invBody').innerHTML = list.map(p => {
         const status = p.stock <= 0 ? ['Agotado', 'bg-red-100 text-red-800'] : p.stock <= p.low ? ['Bajo', 'bg-amber-100 text-amber-900'] : ['OK', 'bg-emerald-50 text-emerald-800']
         return `<tr>

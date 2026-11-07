@@ -47,7 +47,7 @@
 <!-- Barra demo -->
 <div class="bg-navy text-white/80 text-sm">
     <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
-        <span>Demo de MC Designs para Siovera Distributor. Los datos son de ejemplo.</span>
+        <span>Demo de MC Designs con el catálogo de Siovera. Precios, existencias y clientes son de ejemplo.</span>
         <span class="flex gap-4">
             <a href="/siovera/admin" class="underline hover:text-white">Ver panel de Siovera →</a>
             <button id="resetDemo" class="underline hover:text-white">Reiniciar demo</button>
@@ -109,7 +109,9 @@
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-2xl">🔍</span>
         </div>
         <div id="cats" class="flex gap-2 overflow-x-auto hide-scroll mt-4 pb-1"></div>
-        <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5"></div>
+        <p id="count" class="text-navy/60 mt-4"></p>
+        <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3"></div>
+        <button id="more" class="btn btn-ghost w-full text-lg mt-5" hidden></button>
     </main>
 
     <!-- Carrito -->
@@ -177,6 +179,7 @@ let client = null
 let cart = {}
 let cat = 'todo'
 let view = 'catalog'
+let shown = 24
 const $ = id => document.getElementById(id)
 
 try { const s = sessionStorage.getItem('siovera-client'); if (s) client = state.clients.find(c => c.id === s) || null } catch (e) {}
@@ -243,12 +246,17 @@ function renderCats() {
     const all = [{ id: 'todo', name: 'Todo', icon: '🛒' }, ...CATEGORIES]
     $('cats').innerHTML = all.map(c => `<button class="chip ${c.id === cat ? 'on' : ''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`).join('')
 }
-$('cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) { cat = b.dataset.cat; renderCats(); renderGrid() } })
-$('search').addEventListener('input', () => renderGrid())
+$('cats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) { cat = b.dataset.cat; shown = 24; renderCats(); renderGrid() } })
+$('search').addEventListener('input', () => { shown = 24; renderGrid() })
+$('more').addEventListener('click', () => { shown += 24; renderGrid() })
 
 function renderGrid() {
     const q = $('search').value.trim().toLowerCase()
-    const items = state.products.filter(p => (cat === 'todo' || p.cat === cat) && (!q || (p.name + ' ' + p.sku).toLowerCase().includes(q)))
+    const all = state.products.filter(p => (cat === 'todo' || p.cat === cat) && (!q || (p.name + ' ' + p.sku + ' ' + (p.sub || '')).toLowerCase().includes(q)))
+    const items = all.slice(0, shown)
+    $('more').hidden = all.length <= shown
+    $('more').textContent = `Ver más productos (${all.length - shown} más)`
+    $('count').textContent = `${all.length} producto${all.length === 1 ? '' : 's'}`
     $('grid').innerHTML = items.map(p => {
         const q = cart[p.id] || 0
         const out = p.stock <= 0
@@ -256,8 +264,8 @@ function renderGrid() {
             <div class="flex gap-4">
                 <div class="w-20 h-20 rounded-2xl bg-paper flex items-center justify-center text-4xl shrink-0">${p.emoji}</div>
                 <div class="min-w-0">
-                    <p class="font-bold leading-snug">${p.name}</p>
-                    <p class="text-navy/60 text-base">${p.unit}</p>
+                    <p class="font-bold leading-snug break-words">${p.name}</p>
+                    <p class="text-navy/60 text-base">${p.sku} · ${p.unit}${p.sub ? ' · ' + p.sub : ''}</p>
                     <p class="text-2xl font-extrabold mt-1">${money(price(p))}</p>
                 </div>
             </div>
@@ -321,7 +329,7 @@ function renderCart() {
         const p = state.products.find(x => x.id === pid)
         return `<div class="p-4 flex items-center gap-3">
             <div class="w-14 h-14 rounded-xl bg-paper flex items-center justify-center text-3xl shrink-0">${p.emoji}</div>
-            <div class="flex-1 min-w-0"><p class="font-bold leading-snug">${p.name}</p><p class="text-navy/60 text-base">${money(price(p))} · ${p.unit}</p></div>
+            <div class="flex-1 min-w-0"><p class="font-bold leading-snug break-words">${p.name}</p><p class="text-navy/60 text-base">${money(price(p))} · ${p.unit}</p></div>
             <div class="flex items-center gap-2">
                 <button class="qty-btn bg-[#ECE8DE] !w-11 !h-11 !text-2xl" data-dec="${p.id}">−</button>
                 <span class="w-8 text-center text-xl font-extrabold">${q}</span>
